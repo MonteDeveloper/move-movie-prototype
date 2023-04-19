@@ -30,7 +30,6 @@ async function checkApi() {
         msg = "Password errata, riprova:";
     }
     // La chiave API è valida, gestisci i dati qui
-    console.log(data);
 }
 
 async function getMovieIdByTitle(movieTitle) {
@@ -112,7 +111,6 @@ let queue = [];
 function processQueue() {
     if (queue.length > 0) {
         let mediaType = queue.shift();
-        console.log(mediasCounter, queue.length, mediasCounter - queue.length);
         addRndMediaToScroll(mediaType, mediasCounter - queue.length - 1);
         setTimeout(processQueue, 1500);
     }
@@ -136,21 +134,22 @@ scrollDiv.addEventListener("scroll", (e) => {
     let lastChild = scrollDiv.lastElementChild;
     let lastChildTop = lastChild.offsetTop;
     if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
-        addOneElementToScroll()
+        addOneElementToScroll();
     }
 });
 
 function addOneElementToScroll(){
     // Controlla il numero di elementi "my-movieContainer"
+    addMediaBoxToScroll();
     let movieContainers = scrollDiv.querySelectorAll(".my-movieContainer");
-    if (movieContainers.length >= nMaxMediaScroll) {
+    if (movieContainers.length > nMaxMediaScroll) {
         // Rimuovi il primo elemento e aggiorna la posizione dello scroll
         let firstChild = movieContainers[0];
-        let firstChildHeight = firstChild.offsetHeight;
-        scrollDiv.scrollTop -= firstChildHeight;
+        let lastChild = movieContainers[movieContainers.length - 1];
+        let lastChildHeight = lastChild.offsetHeight;
         firstChild.remove();
+        scrollDiv.style.marginTop += lastChildHeight;
     }
-    addMediaBoxToScroll();
     queue.push("movie");
     if (queue.length === 1) {
         setTimeout(processQueue, 1500);
@@ -283,11 +282,13 @@ function setMedias(mediaId, mediaType, position){
 
     getMediaDataById(mediaId, mediaType)
         .then(media => {
+            console.log("checkTitle", position, mediaId);
             titleBox.innerHTML = mediaType === 'movie' ? media.title : media.name;
         });
     
     getHigherResImageOfMediaId(mediaId, mediaType)
         .then(imgPath => {
+            console.log("checkImage", position, mediaId);
             posterBox.style.backgroundImage = `url(${imgPath})`;
             movieBgImage.style.backgroundImage = `url(${imgPath})`;
         });
@@ -302,7 +303,6 @@ appContainer.addEventListener('click', (event) => {
     } 
     
     const button = event.target;
-    console.log(button);
     button.classList.toggle("my-active");
 })
 
