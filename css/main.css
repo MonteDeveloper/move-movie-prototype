@@ -53,6 +53,24 @@ html {margin: 0; overflow: hidden; position: relative;}
     
 }
 
+.fa-spinner{
+    animation: spin 1s linear infinite;
+    font-size: 2rem;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: calc(50% - 6rem);
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+@keyframes spin {
+    100%{
+        rotate: 360deg;
+    }
+}
+
 .my-movieBgImage{
     position: absolute;
     width: 100%;
@@ -85,7 +103,7 @@ html {margin: 0; overflow: hidden; position: relative;}
 }
 
 .my-moviePoster{
-    background-color: white;
+    background-color: #1a1a1a;
     width: calc(100% - var(--generalMargin));
     height: calc(100dvh - 1rem  - var(--footHeight) - (var(--generalMargin) * 2) - var(--filterHeight) - var(--titleMovieHeight));
     margin-top: 1rem;
