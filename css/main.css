@@ -1,0 +1,189 @@
+:root{
+    --footHeight: 75px;
+    --generalMargin: 2rem;
+    --filterHeight: 60px;
+    --titleMovieHeight: 50px;
+}
+
+html {margin: 0; overflow: hidden; position: relative;}
+
+.my-blackScreen{
+    background-color: black;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 990;
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+
+.my-appContainer{
+    position: relative;
+    min-width: 100px;
+    max-width: 500px;
+    height: 100dvh;
+    margin: 0 auto;
+
+    border-top: 1px solid #474748;
+}
+
+.my-bodyApp{
+    height: 100dvh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+}
+
+.my-bodyApp::-webkit-scrollbar{
+    display: none;
+}
+
+.my-movieContainer{
+    position: relative;
+    padding-bottom: var(--footHeight);
+    background-color: rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+
+    height: 100dvh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
+    -webkit-box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 0px 0px 25px 4px rgba(0, 0, 0, 0);
+    box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 0px 0px 25px 4px rgba(0, 0, 0, 0);
+    
+}
+
+.my-movieBgImage{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-size: auto;
+    background-position: center;
+    filter: blur(10px);
+    z-index: -1;
+    opacity: .5;
+    scale: 2;
+
+    animation: 35s linear infinite rotation;
+}
+
+.my-movieTitle{
+    display: block;
+    height: var(--titleMovieHeight);
+    line-height: var(--titleMovieHeight);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - var(--generalMargin));
+
+    font-size: 1rem;
+
+    border-radius: 0 0 25px 25px;
+    background-color: #1a1a1a;
+}
+
+.my-moviePoster{
+    background-color: white;
+    width: calc(100% - var(--generalMargin));
+    height: calc(100dvh - 1rem  - var(--footHeight) - (var(--generalMargin) * 2) - var(--filterHeight) - var(--titleMovieHeight));
+    margin-top: 1rem;
+
+    border-radius: 25px 25px 0 0;
+    background-size: cover;
+    background-position: center;
+}
+
+
+footer{
+    position: fixed;
+    min-width: 100px;
+    max-width: 500px;
+    width: 100%;
+
+    bottom: var(--generalMargin);
+    left: 50%;
+    transform: translate(-50%, 0);
+
+    z-index: 999;
+}
+
+nav{
+    width: calc(100% - var(--generalMargin));
+    height: var(--footHeight);
+    border-radius: 25px;
+    background-color: #1a1a1a;
+    color: #474748;
+}
+
+nav .fa-solid:hover{
+    color: white;
+    transition: color .2s;
+}
+
+.navIconActive{
+    background-color: crimson;
+    color: white;
+    padding: 1rem;
+    border-radius: 20px;
+    translate: 0 -25%;
+}
+
+.my-btn{
+    background-color: white !important;
+    border-radius: 15px !important;
+    font-weight: 500 !important;
+    transition: translate .2s, color .2s, background-color .2s !important;
+}
+
+.my-toggleBtn:active{
+    scale: .95;
+}
+
+.my-btn.my-active{
+    color: white !important;
+    background-color: crimson !important;
+}
+
+.my-filterBox{
+    height: var(--filterHeight);
+}
+
+.my-filterBox button{
+    z-index: 99999;
+}
+
+.my-filterBox > div{
+    position: absolute;
+    width: calc(100% - var(--generalMargin));
+    background-color: #1a1a1a;
+    height: 80vh;
+    bottom: 0;
+    left: 50%;
+    translate: -50% 0;
+    border-radius: 25px;
+    z-index: 9999;
+    transform-origin: bottom center;
+    scale: 1 0;
+    transition: scale .2s ease-out;
+}
+
+.my-filterBox > div section > div{
+    overflow-x: scroll;
+}
+
+.my-genreBtn{
+    width: 150px;
+    height: 62px;
+}
+
+.my-filterBox > div section > div::-webkit-scrollbar{
+    display: none;
+}
+
+@keyframes rotation {
+    100%{
+        rotate: 360deg;
+    }
+}
