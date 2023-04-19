@@ -8,7 +8,7 @@ document.addEventListener('gesturestart', function (e) {
     e.preventDefault();
 });
 
-let mediasCounter = 1;
+let mediasCounter = 0;
 
 let currentMediaLoading = false;
 
@@ -103,7 +103,7 @@ var scrollDiv = document.getElementsByClassName("my-bodyApp")[0];
 
 // scrollDiv.addEventListener("scroll", (e) => {
 //     if (scrollDiv.offsetHeight + scrollDiv.scrollTop >= scrollDiv.scrollHeight) {
-//         addRndMediaToScroll("movie");
+//         addRndMediaToScroll("movie");scroll
 //     }
 // });
 
@@ -112,29 +112,57 @@ let queue = [];
 function processQueue() {
     if (queue.length > 0) {
         let mediaType = queue.shift();
-        addRndMediaToScroll(mediaType);
+        console.log(mediasCounter, queue.length, mediasCounter - queue.length);
+        addRndMediaToScroll(mediaType, mediasCounter - queue.length - 1);
         setTimeout(processQueue, 1500);
     }
 }
+
+// scrollDiv.addEventListener("scroll", (e) => {
+//     let lastChild = scrollDiv.lastElementChild;
+//     let lastChildTop = lastChild.offsetTop;
+//     if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
+//         addMediaBoxToScroll();
+//         queue.push("movie");
+//         if (queue.length === 1) {
+//             setTimeout(processQueue, 1500);
+//         }
+//     }
+// });
+
+let nMaxMediaScroll = 10;
 
 scrollDiv.addEventListener("scroll", (e) => {
     let lastChild = scrollDiv.lastElementChild;
     let lastChildTop = lastChild.offsetTop;
     if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
-        addMediaBoxToScroll();
-        queue.push("movie");
-        if (queue.length === 1) {
-            setTimeout(processQueue, 1500);
-        }
+        addOneElementToScroll()
     }
 });
 
-function addRndMediaToScroll(mediaType){
+function addOneElementToScroll(){
+    // Controlla il numero di elementi "my-movieContainer"
+    let movieContainers = scrollDiv.querySelectorAll(".my-movieContainer");
+    if (movieContainers.length >= nMaxMediaScroll) {
+        // Rimuovi il primo elemento e aggiorna la posizione dello scroll
+        let firstChild = movieContainers[0];
+        let firstChildHeight = firstChild.offsetHeight;
+        scrollDiv.scrollTop -= firstChildHeight;
+        firstChild.remove();
+    }
+    addMediaBoxToScroll();
+    queue.push("movie");
+    if (queue.length === 1) {
+        setTimeout(processQueue, 1500);
+    }
+}
+
+function addRndMediaToScroll(mediaType, position){
 
     setTimeout(() => 
     getRandomMedia(mediaType).then(rndMedia => {
         console.log(rndMedia.id);
-        addMediaInfoToScroll(rndMedia.id, mediaType);
+        addMediaInfoToScroll(rndMedia.id, mediaType, position);
     }), 2000);
 
     // checkMediaLoading(mediaType);
@@ -157,18 +185,14 @@ async function app() {
 
     writeGenreSection();
 
-    getRandomMedia("movie").then(rndMedia => {
-        setMedias(rndMedia.id, "movie");
-    });
-    getRandomMedia("movie").then(rndMedia => {
-        setMedias(rndMedia.id, "movie");
-    });
+    addOneElementToScroll();
+    addOneElementToScroll();
 }
 
 
 function addMediaBoxToScroll(){
     document.getElementsByClassName("my-bodyApp")[0].innerHTML += `
-        <div class="my-movieContainer d-flex flex-wrap justify-content-center align-content-start w-100">
+        <div id="media-${mediasCounter}" class="my-movieContainer d-flex flex-wrap justify-content-center align-content-start w-100">
             <div class="my-moviePoster"></div>
             <h2 class="my-movieTitle m-0 px-3">
                 <i class="fa-solid fa-spinner"></i>
@@ -176,10 +200,12 @@ function addMediaBoxToScroll(){
             <div class="my-movieBgImage"></div>
         </div>
     `;
+
+    mediasCounter += 1;
 }
 
-function addMediaInfoToScroll(mediaId, mediaType){
-    setMedias(mediaId, mediaType); 
+function addMediaInfoToScroll(mediaId, mediaType, position){
+    setMedias(mediaId, mediaType, position); 
 }
 
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -238,35 +264,33 @@ async function getTotalPages(mediaType) {
     return data.total_pages;
 }
 
-function setMedias(mediaId, mediaType){
+function setMedias(mediaId, mediaType, position){
     // let searchBar = document.getElementById("my-searchbar");
     // let selectMediaType = document.getElementById("my-selectMediaType");
 
     // let title = "Ant Man";
     // let type = "movie";
 
-    let posterBoxesList = document.getElementsByClassName("my-moviePoster");
-    let titleBoxesList = document.getElementsByClassName("my-movieTitle");
-    let movieBgImagesList = document.getElementsByClassName("my-movieBgImage");
-    let moviesList = document.getElementsByClassName("my-movieContainer");
+    console.log(position);
+    let media = document.getElementById(`media-${position}`);
+    let mediaChildren = media.children;
+    let posterBox = mediaChildren[0];
+    let titleBox = mediaChildren[1];
+    let movieBgImage = mediaChildren[2];
 
-    let position = mediasCounter - 1;
-
-    moviesList[position].setAttribute('data-id', mediaId);
-    moviesList[position].setAttribute('data-type', mediaType);
+    media.setAttribute('data-id', mediaId);
+    media.setAttribute('data-type', mediaType);
 
     getMediaDataById(mediaId, mediaType)
         .then(media => {
-            titleBoxesList[position].innerHTML = mediaType === 'movie' ? media.title : media.name;
+            titleBox.innerHTML = mediaType === 'movie' ? media.title : media.name;
         });
     
     getHigherResImageOfMediaId(mediaId, mediaType)
         .then(imgPath => {
-            posterBoxesList[position].style.backgroundImage = `url(${imgPath})`;
-            movieBgImagesList[position].style.backgroundImage = `url(${imgPath})`;
+            posterBox.style.backgroundImage = `url(${imgPath})`;
+            movieBgImage.style.backgroundImage = `url(${imgPath})`;
         });
-
-    mediasCounter += 1;
 }
 
 const appContainer = document.getElementsByClassName('my-appContainer')[0];
