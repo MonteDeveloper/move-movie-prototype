@@ -118,7 +118,9 @@ function processQueue() {
 }
 
 scrollDiv.addEventListener("scroll", (e) => {
-    if (scrollDiv.offsetHeight + scrollDiv.scrollTop >= scrollDiv.scrollHeight) {
+    let lastChild = scrollDiv.lastElementChild;
+    let lastChildTop = lastChild.offsetTop;
+    if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
         addMediaBoxToScroll();
         queue.push("movie");
         if (queue.length === 1) {
