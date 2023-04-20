@@ -1,25 +1,92 @@
-const movieId = '502356'; // inserisci qui l'ID del film
-let apiKey;
+//! VARIABILI GLOBALI------------------------
+const BASE_URL = 'https://api.themoviedb.org/3';
+let API_KEY;
 let msg = 'Inserisci la password per accedere al servizio:';
 
+let mediasCounter = 0;
+let currentMediaLoading = false;
+
+let scrollDiv = document.getElementsByClassName("my-moviesContainer")[0];
+let queueOfMediaTypeToLoad = [];
+let nMaxMediaScroll = 10;
+let eventCounter = 0;
+let isAddingElements = false;
+let scrollTimer = null;
+
+const appContainer = document.getElementsByClassName('my-appContainer')[0];
+
+//! EVENTS LISTENER--------------------------
 //serve a non permettere lo zoom così sembra un app a tutti gli effetti
 // attenzione: devi combinarlo con il css body{touch-action: none;}
 document.addEventListener('gesturestart', function (e) {
     e.preventDefault();
 });
 
-let mediasCounter = 0;
+scrollDiv.addEventListener("scroll", (e) => {
+    if (isAddingElements) return;
+    let lastChild = scrollDiv.lastElementChild;
+    let lastChildTop = lastChild.offsetTop;
+    if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
+        isAddingElements = true;
+        addMediaToScroll();
+        eventCounter += 1;
+        console.log(eventCounter, "eventCounter");
+        isAddingElements = false;
+    }
+    // if (isAddingElements) return;
+    // if (scrollTimer) clearTimeout(scrollTimer);
+    // scrollTimer = setTimeout(() => {
+    //     let lastChild = scrollDiv.lastElementChild;
+    //     let lastChildTop = lastChild.offsetTop;
+    //     if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
+    //         isAddingElements = true;
+    //         addMediaToScroll();
+    //         eventCounter += 1;
+    //         console.log(eventCounter, "eventCounter");
+    //         isAddingElements = false;
+    //     }
+    // }, 100);
+    // let lastChild = scrollDiv.lastElementChild;
+    // let lastChildTop = lastChild.offsetTop;
+    // if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
+    //     isAddingElements = true;
+    //     addMediaToScroll();
+    //     eventCounter += 1;
+    //     console.log(eventCounter, "eventCounter");
+    //     isAddingElements = false;
+    // }
+});
 
-let currentMediaLoading = false;
+appContainer.addEventListener('click', (event) => {
+    const isToggleButton = event.target.classList.contains("my-btn");
+    if (!isToggleButton) {
+        return;
+    } 
+    
+    const button = event.target;
+    button.classList.toggle("my-active");
+})
 
-app();
+//! MAIN APP---------------------------------
+async function main() {  
+    await checkApi();
 
+    writeGenreSection();
+
+    addMediaToScroll();
+    addMediaToScroll();
+    addMediaToScroll();
+}
+
+main();
+
+//! FUNCTIONS--------------------------------
 async function checkApi() {
     let data;
     while (!data) {
-        apiKey = prompt(msg);
+        API_KEY = prompt(msg);
         try {
-            const response = await fetch(`https://api.themoviedb.org/3/movie/550?api_key=${apiKey}`);
+            const response = await fetch(`https://api.themoviedb.org/3/movie/550?api_key=${API_KEY}`);
             if (!response.ok) {
                 throw new Error('Chiave API non valida');
             }
@@ -32,45 +99,33 @@ async function checkApi() {
     // La chiave API è valida, gestisci i dati qui
 }
 
-async function getMovieIdByTitle(movieTitle) {
-    const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${movieTitle}&language=it-IT-IT`);
-    const data = await response.json();
-    return data.results[0].id;
-}
-
-async function getMovieDataById(movieId) {
-    const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=it-IT-IT`);
-    const data = await response.json();
-    return data;
-}
-
 async function getMediaDataById(mediaId, mediaType) {
-    const response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}?api_key=${apiKey}&language=it-IT-IT`);
+    const response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}?api_key=${API_KEY}&language=it-IT-IT`);
     const data = await response.json();
     return data;
 }
 
 async function getMediaIdByTitle(title, mediaType, resultNumber) {
-    const response = await fetch(`https://api.themoviedb.org/3/search/${mediaType}?api_key=${apiKey}&query=${title}&language=it-IT-IT`);
+    const response = await fetch(`https://api.themoviedb.org/3/search/${mediaType}?api_key=${API_KEY}&query=${title}&language=it-IT-IT`);
     const data = await response.json();
     return data.results[resultNumber].id;
 }
 
 async function getHigherResImageOfMediaId(mediaId, mediaType) {
-    let response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${apiKey}&include_image_language=it`);
+    let response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${API_KEY}&include_image_language=it`);
     let data = await response.json();
     
     let posters = data.posters;
 
     if(posters.length <= 0){
-        response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${apiKey}&include_image_language=en`);
+        response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${API_KEY}&include_image_language=en`);
         data = await response.json();
         
         posters = data.posters;
     }
 
     if(posters.length <= 0){
-        response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${apiKey}`);
+        response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${API_KEY}`);
         data = await response.json();
         
         posters = data.posters;
@@ -90,108 +145,66 @@ async function getHigherResImageOfMediaId(mediaId, mediaType) {
     return `https://image.tmdb.org/t/p/w1280${highestResolutionImage.file_path}`;
 }
 
-async function getGenresListOf(mediaType) {
-    const url = `https://api.themoviedb.org/3/genre/${mediaType}/list?api_key=${apiKey}`;
+async function getGenresListOfMediaType(mediaType) {
+    const url = `https://api.themoviedb.org/3/genre/${mediaType}/list?api_key=${API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
     return data.genres;
 }
 
-var scrollDiv = document.getElementsByClassName("my-bodyApp")[0];
-
-
-// scrollDiv.addEventListener("scroll", (e) => {
-//     if (scrollDiv.offsetHeight + scrollDiv.scrollTop >= scrollDiv.scrollHeight) {
-//         addRndMediaToScroll("movie");scroll
-//     }
-// });
-
-let queue = [];
-
 function processQueue() {
-    if (queue.length > 0) {
-        let mediaType = queue.shift();
-        addRndMediaToScroll(mediaType, mediasCounter - queue.length - 1);
+    while(queueOfMediaTypeToLoad.length >= nMaxMediaScroll){
+        queueOfMediaTypeToLoad.shift()
+    }
+    if (queueOfMediaTypeToLoad.length > 0) {
+        let queueOfMediaTypeToLoadLength = queueOfMediaTypeToLoad.length;
+        let mediaType = queueOfMediaTypeToLoad.shift();
+        
+        addRndMediaInfoToMediaBox(mediaType, (mediasCounter - queueOfMediaTypeToLoadLength + 1));
         setTimeout(processQueue, 1500);
     }
 }
 
-// scrollDiv.addEventListener("scroll", (e) => {
-//     let lastChild = scrollDiv.lastElementChild;
-//     let lastChildTop = lastChild.offsetTop;
-//     if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
-//         addMediaBoxToScroll();
-//         queue.push("movie");
-//         if (queue.length === 1) {
-//             setTimeout(processQueue, 1500);
-//         }
-//     }
-// });
-
-let nMaxMediaScroll = 10;
-
-scrollDiv.addEventListener("scroll", (e) => {
-    let lastChild = scrollDiv.lastElementChild;
-    let lastChildTop = lastChild.offsetTop;
-    if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
-        addOneElementToScroll();
-    }
-});
-
-function addOneElementToScroll(){
+function addMediaToScroll(){
+    let currentScrollTop = scrollDiv.scrollTop;
     // Controlla il numero di elementi "my-movieContainer"
     addMediaBoxToScroll();
-    let movieContainers = scrollDiv.querySelectorAll(".my-movieContainer");
+    let movieContainers = scrollDiv.querySelectorAll(".my-movieBox");
     if (movieContainers.length > nMaxMediaScroll) {
         // Rimuovi il primo elemento e aggiorna la posizione dello scroll
         let firstChild = movieContainers[0];
         let lastChild = movieContainers[movieContainers.length - 1];
         let lastChildHeight = lastChild.offsetHeight;
         firstChild.remove();
-        scrollDiv.style.marginTop += lastChildHeight;
+        scrollDiv.scrollTop = currentScrollTop - lastChildHeight;
+        setTimeout(() => {
+            isAddingElements = false;
+        }, 100);
+        // scrollDiv.scrollTop -= lastChildHeight;
+        // scrollDiv.style.marginTop = (parseInt(scrollDiv.style.marginTop) + lastChildHeight) + "px";
     }
-    queue.push("movie");
-    if (queue.length === 1) {
+    queueOfMediaTypeToLoad.push("movie");
+
+    if (queueOfMediaTypeToLoad.length === 1) {
         setTimeout(processQueue, 1500);
     }
 }
 
-function addRndMediaToScroll(mediaType, position){
+function addRndMediaInfoToMediaBox(mediaType, position){
 
     setTimeout(() => 
-    getRandomMedia(mediaType).then(rndMedia => {
+    getRndMediaOfMediaType(mediaType).then(rndMedia => {
         console.log(rndMedia.id);
-        addMediaInfoToScroll(rndMedia.id, mediaType, position);
+        setMediaInfoToMediaBox(rndMedia.id, mediaType, position);
     }), 2000);
 
     // checkMediaLoading(mediaType);
 }
 
-// function checkMediaLoading(mediaType) {
-//     if (!currentMediaLoading) {
-//         currentMediaLoading = true;
-//         getRandomMedia(mediaType).then(rndMedia => {
-//             console.log(rndMedia.id);
-//             addMediaInfoToScroll(rndMedia.id, mediaType);
-//         });
-//     } else {
-//         setTimeout(checkMediaLoading, 2000);
-//     }
-// }
-
-async function app() {  
-    await checkApi();
-
-    writeGenreSection();
-
-    addOneElementToScroll();
-    addOneElementToScroll();
-}
-
-
 function addMediaBoxToScroll(){
-    document.getElementsByClassName("my-bodyApp")[0].innerHTML += `
-        <div id="media-${mediasCounter}" class="my-movieContainer d-flex flex-wrap justify-content-center align-content-start w-100">
+    mediasCounter += 1;
+    document.getElementsByClassName("my-moviesContainer")[0].innerHTML += `
+        <div id="media-${mediasCounter}" class="my-movieBox d-flex flex-wrap justify-content-center align-content-start w-100">
             <div class="my-moviePoster"></div>
             <h2 class="my-movieTitle m-0 px-3">
                 <i class="fa-solid fa-spinner"></i>
@@ -199,47 +212,12 @@ function addMediaBoxToScroll(){
             <div class="my-movieBgImage"></div>
         </div>
     `;
-
-    mediasCounter += 1;
 }
 
-function addMediaInfoToScroll(mediaId, mediaType, position){
-    setMedias(mediaId, mediaType, position); 
-}
-
-const BASE_URL = 'https://api.themoviedb.org/3';
-
-// async function getRandomMovie() {
-//     const latestMovieId = await getLatestMovieId();
-//     let movieDetails = null;
-//     while (!movieDetails || !movieDetails.poster_path) {
-//         const randomMovieId = Math.floor(Math.random() * latestMovieId) + 1;
-//         movieDetails = await getMovieDetails(randomMovieId);
-//     }
-//     return movieDetails;
-// }
-  
-//   async function getLatestMovieId() {
-//     const url = `https://api.themoviedb.org/3/movie/latest?api_key=${apiKey}&language=it-IT`;
-//     const response = await fetch(url);
-//     const data = await response.json();
-//     return data.id;
-//   }
-  
-//   async function getMovieDetails(movieId) {
-//       const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=it-IT`;
-//       const response = await fetch(url);
-//       if (!response.ok) {
-//           return null;
-//       }
-//       const data = await response.json();
-//       return data;
-//   }
-
-async function getRandomMedia(mediaType) {
+async function getRndMediaOfMediaType(mediaType) {
     const totalPages = await getTotalPages(mediaType);
     const randomPage = Math.floor(Math.random() * totalPages) + 1;
-    const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${apiKey}&language=it-IT&sort_by=popularity.desc&page=${randomPage}`;
+    const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&page=${randomPage}`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -252,7 +230,7 @@ async function getRandomMedia(mediaType) {
 
 async function getTotalPages(mediaType) {
     return 500;
-    const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${apiKey}&language=it-IT&sort_by=popularity.desc&page=1`;
+    const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&page=1`;
     const response = await fetch(url);
     const data = await response.json();
     
@@ -263,15 +241,9 @@ async function getTotalPages(mediaType) {
     return data.total_pages;
 }
 
-function setMedias(mediaId, mediaType, position){
-    // let searchBar = document.getElementById("my-searchbar");
-    // let selectMediaType = document.getElementById("my-selectMediaType");
-
-    // let title = "Ant Man";
-    // let type = "movie";
-
-    console.log(position);
-    let media = document.getElementById(`media-${position}`);
+function setMediaInfoToMediaBox(mediaId, mediaType, mediaBoxPosition){
+    console.log(mediaBoxPosition);
+    let media = document.getElementById(`media-${mediaBoxPosition}`);
     let mediaChildren = media.children;
     let posterBox = mediaChildren[0];
     let titleBox = mediaChildren[1];
@@ -282,46 +254,32 @@ function setMedias(mediaId, mediaType, position){
 
     getMediaDataById(mediaId, mediaType)
         .then(media => {
-            console.log("checkTitle", position, mediaId);
+            console.log("checkTitle", mediaBoxPosition, mediaId);
             titleBox.innerHTML = mediaType === 'movie' ? media.title : media.name;
         });
     
     getHigherResImageOfMediaId(mediaId, mediaType)
         .then(imgPath => {
-            console.log("checkImage", position, mediaId);
+            console.log("checkImage", mediaBoxPosition, mediaId);
             posterBox.style.backgroundImage = `url(${imgPath})`;
             movieBgImage.style.backgroundImage = `url(${imgPath})`;
         });
 }
 
-const appContainer = document.getElementsByClassName('my-appContainer')[0];
-
-appContainer.addEventListener('click', (event) => {
-    const isToggleButton = event.target.classList.contains("my-toggleBtn");
-    if (!isToggleButton) {
-        return;
-    } 
-    
-    const button = event.target;
-    button.classList.toggle("my-active");
-})
-
-
 function toggleFilters(filterBtn){
-    filterBtn.classList.toggle("my-filterBtnOpened");
-    filterContainer = document.getElementsByClassName("my-filterBox")[0].querySelector('div');
+    filterBox = document.getElementsByClassName("my-filterContainer")[0].querySelector('div');
 
     blackScreen = document.getElementsByClassName("my-blackScreen")[0];
 
-    if(filterBtn.classList.contains('my-filterBtnOpened')){
-        filterBtn.style.translate = "0 calc(-80vh + var(--filterHeight) * 2.2)";
-        filterContainer.style.scale = "1 1";
+    if(!filterBtn.classList.contains('my-active')){
+        filterBtn.style.transform = "translate(0, calc(-80vh + var(--btnFilterHeight) * 2.2))";
+        filterBox.style.transform = "translate(-50%, 0) scale(1, 1)";
         blackScreen.style.opacity = ".8";
         blackScreen.style.pointerEvents = "all";
         filterBtn.innerHTML = '<i class="fa-solid fa-arrow-down-wide-short"></i> FILTRI';
     }else{
-        filterBtn.style.translate = "0 0";
-        filterContainer.style.scale = "1 0";
+        filterBtn.style.transform = "translate(0, 0)";
+        filterBox.style.transform = "translate(-50%, 0) scale(1, 0)";
         blackScreen.style.opacity = "0";
         blackScreen.style.pointerEvents = "none";
         filterBtn.innerHTML = '<i class="fa-solid fa-arrow-up-wide-short"></i> FILTRI';
@@ -331,10 +289,10 @@ function toggleFilters(filterBtn){
 function writeGenreSection(){
     const genreSection = document.getElementById("my-filterGenreSection");
 
-    getGenresListOf("movie").then(genres => {
+    getGenresListOfMediaType("movie").then(genres => {
         for(genre of genres){
             genreSection.innerHTML += `
-                <button class="btn my-btn my-genreBtn my-toggleBtn text-uppercase text-center m-1" data-id="${genre.id}">${genre.name}</button>
+                <button class="btn my-btn text-uppercase text-center m-1" data-id="${genre.id}">${genre.name}</button>
             `;
         }
 

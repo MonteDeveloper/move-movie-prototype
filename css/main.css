@@ -1,11 +1,23 @@
+/* ? VARIABILI------------------------------------------ */
 :root{
     --footHeight: 75px;
     --generalMargin: 2rem;
-    --filterHeight: 60px;
+    --btnFilterHeight: 60px;
     --titleMovieHeight: 50px;
 }
 
+/* ? GENERAL------------------------------------------ */
 html {margin: 0; overflow: hidden; position: relative;}
+
+.my-appContainer{
+    position: relative;
+    min-width: 100px;
+    max-width: 500px;
+    height: 100vh;
+    margin: 0 auto;
+
+    border-top: 1px solid #474748;
+}
 
 .my-blackScreen{
     background-color: black;
@@ -18,57 +30,30 @@ html {margin: 0; overflow: hidden; position: relative;}
     pointer-events: none;
 }
 
-.my-appContainer{
-    position: relative;
-    min-width: 100px;
-    max-width: 500px;
-    height: 100dvh;
-    margin: 0 auto;
-
-    border-top: 1px solid #474748;
-}
-
-.my-bodyApp{
-    height: 100dvh;
+/* ? MOVIE CONTAINER----------------------------------- */
+.my-moviesContainer{
+    height: 100vh;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
 }
 
-.my-bodyApp::-webkit-scrollbar{
+.my-moviesContainer::-webkit-scrollbar{
     display: none;
 }
 
-.my-movieContainer{
+.my-movieBox{
     position: relative;
     padding-bottom: var(--footHeight);
     background-color: rgba(0, 0, 0, 0.7);
     overflow: hidden;
 
-    height: 100dvh;
+    height: 100vh;
     scroll-snap-align: start;
     scroll-snap-stop: always;
 
     -webkit-box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 0px 0px 25px 4px rgba(0, 0, 0, 0);
     box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 0px 0px 25px 4px rgba(0, 0, 0, 0);
     
-}
-
-.fa-spinner{
-    animation: spin 1s linear infinite;
-    font-size: 2rem;
-    position: absolute;
-    margin-left: auto;
-    margin-right: auto;
-    top: calc(50% - 6rem);
-    left: 0;
-    right: 0;
-    text-align: center;
-}
-
-@keyframes spin {
-    100%{
-        rotate: 360deg;
-    }
 }
 
 .my-movieBgImage{
@@ -84,7 +69,7 @@ html {margin: 0; overflow: hidden; position: relative;}
     opacity: .5;
     scale: 2;
 
-    animation: 35s linear infinite rotation;
+    animation: 35s linear infinite spin;
 }
 
 .my-movieTitle{
@@ -105,7 +90,7 @@ html {margin: 0; overflow: hidden; position: relative;}
 .my-moviePoster{
     background-color: #1a1a1a;
     width: calc(100% - var(--generalMargin));
-    height: calc(100dvh - 1rem  - var(--footHeight) - (var(--generalMargin) * 2) - var(--filterHeight) - var(--titleMovieHeight));
+    height: calc(100vh - 1rem  - var(--footHeight) - (var(--generalMargin) * 2) - var(--btnFilterHeight) - var(--titleMovieHeight));
     margin-top: 1rem;
 
     border-radius: 25px 25px 0 0;
@@ -113,7 +98,25 @@ html {margin: 0; overflow: hidden; position: relative;}
     background-position: center;
 }
 
+.fa-spinner{
+    animation: spin 1s linear infinite;
+    font-size: 2rem;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: calc(50% - 6rem);
+    left: 0;
+    right: 0;
+    text-align: center;
+}
 
+@keyframes spin {
+    100%{
+        rotate: 360deg;
+    }
+}
+
+/* ? FOOTER NAV-------------------------------------- */
 footer{
     position: fixed;
     min-width: 100px;
@@ -127,7 +130,7 @@ footer{
     z-index: 999;
 }
 
-nav{
+footer nav{
     width: calc(100% - var(--generalMargin));
     height: var(--footHeight);
     border-radius: 25px;
@@ -135,12 +138,12 @@ nav{
     color: #474748;
 }
 
-nav .fa-solid:hover{
+footer nav .fa-solid:hover{
     color: white;
     transition: color .2s;
 }
 
-.navIconActive{
+footer nav .fa-solid.my-active{
     background-color: crimson;
     color: white;
     padding: 1rem;
@@ -148,60 +151,56 @@ nav .fa-solid:hover{
     translate: 0 -25%;
 }
 
+/* ? BOTTONE GENERALE-------------------------------- */
 .my-btn{
     background-color: white !important;
     border-radius: 15px !important;
     font-weight: 500 !important;
-    transition: translate .2s, color .2s, background-color .2s !important;
+    transition: color .2s, background-color .2s !important;
 }
 
-.my-toggleBtn:active{
+.my-btn:active{
     scale: .95;
 }
 
-.my-btn.my-active{
-    color: white !important;
-    background-color: crimson !important;
+/* ? FILTERBOX-------------------------------------- */
+.my-filterContainer{
+    height: var(--btnFilterHeight);
 }
 
-.my-filterBox{
-    height: var(--filterHeight);
-}
-
-.my-filterBox button{
+.my-filterContainer > .my-btn{
     z-index: 99999;
+    transition: transform .2s !important;
 }
 
-.my-filterBox > div{
+.my-filterContainer > div{
     position: absolute;
     width: calc(100% - var(--generalMargin));
     background-color: #1a1a1a;
     height: 80vh;
     bottom: 0;
     left: 50%;
-    translate: -50% 0;
+    transform: translate(-50%, 0) scale(1, 0);
     border-radius: 25px;
     z-index: 9999;
     transform-origin: bottom center;
-    scale: 1 0;
-    transition: scale .2s ease-out;
+    transition: transform .2s ease-out;
 }
 
-.my-filterBox > div section > div{
+.my-filterContainer > div .my-btn.my-active{
+    color: white !important;
+    background-color: crimson !important;
+}
+
+.my-filterContainer > div section > div{
     overflow-x: scroll;
 }
 
-.my-genreBtn{
+.my-filterGenreSection .my-btn{
     width: 150px;
     height: 62px;
 }
 
-.my-filterBox > div section > div::-webkit-scrollbar{
+.my-filterContainer > div section > div::-webkit-scrollbar{
     display: none;
-}
-
-@keyframes rotation {
-    100%{
-        rotate: 360deg;
-    }
 }
