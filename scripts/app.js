@@ -22,39 +22,22 @@ document.addEventListener('gesturestart', function (e) {
     e.preventDefault();
 });
 
-scrollDiv.addEventListener("scroll", (e) => {
+scrollDiv.addEventListener("touchstart", (e) => {
     if (isAddingElements) return;
     let lastChild = scrollDiv.lastElementChild;
     let lastChildTop = lastChild.offsetTop;
-    if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
+    let mediaItemHeight = lastChild.offsetHeight;
+    if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= mediaItemHeight * 10 - (mediaItemHeight * 1)) {
         isAddingElements = true;
+        addMediaToScroll();
         addMediaToScroll();
         eventCounter += 1;
         console.log(eventCounter, "eventCounter");
         isAddingElements = false;
+
+        console.log(mediaItemHeight * 10 - (mediaItemHeight * 4), "scrollDiv.scrollTop");
+        scrollDiv.pageYOffset  = mediaItemHeight * 10 - (mediaItemHeight * 4);
     }
-    // if (isAddingElements) return;
-    // if (scrollTimer) clearTimeout(scrollTimer);
-    // scrollTimer = setTimeout(() => {
-    //     let lastChild = scrollDiv.lastElementChild;
-    //     let lastChildTop = lastChild.offsetTop;
-    //     if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
-    //         isAddingElements = true;
-    //         addMediaToScroll();
-    //         eventCounter += 1;
-    //         console.log(eventCounter, "eventCounter");
-    //         isAddingElements = false;
-    //     }
-    // }, 100);
-    // let lastChild = scrollDiv.lastElementChild;
-    // let lastChildTop = lastChild.offsetTop;
-    // if (scrollDiv.scrollTop + scrollDiv.offsetHeight >= lastChildTop) {
-    //     isAddingElements = true;
-    //     addMediaToScroll();
-    //     eventCounter += 1;
-    //     console.log(eventCounter, "eventCounter");
-    //     isAddingElements = false;
-    // }
 });
 
 appContainer.addEventListener('click', (event) => {
@@ -73,9 +56,9 @@ async function main() {
 
     writeGenreSection();
 
-    addMediaToScroll();
-    addMediaToScroll();
-    addMediaToScroll();
+    for (let i = nMaxMediaScroll; i > 0; i--) {
+        addMediaToScroll();
+    }
 }
 
 main();
@@ -153,7 +136,7 @@ async function getGenresListOfMediaType(mediaType) {
 }
 
 function processQueue() {
-    while(queueOfMediaTypeToLoad.length >= nMaxMediaScroll){
+    while(queueOfMediaTypeToLoad.length > nMaxMediaScroll){
         queueOfMediaTypeToLoad.shift()
     }
     if (queueOfMediaTypeToLoad.length > 0) {
