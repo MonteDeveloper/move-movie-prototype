@@ -280,7 +280,7 @@ function setMediaInfoToMediaBox(mediaId, mediaType, mediaBoxPosition){
 
                     rows[mediaBoxPosition - 1] = `
                         <div id="media-${mediaBoxPosition}" class="my-movieBox d-flex flex-wrap justify-content-center align-content-start w-100">
-                            <div class="my-moviePoster" style="background-image: url('${imgPath}')"></div>
+                            <div data-media-id="${mediaId}" class="my-moviePoster" style="background-image: url('${imgPath}')" onclick="openMediaInfo(this)"></div>
                             <h2 class="my-movieTitle m-0 px-3">
                                 ${title}
                             </h2>
@@ -294,6 +294,32 @@ function setMediaInfoToMediaBox(mediaId, mediaType, mediaBoxPosition){
     
 
     
+}
+
+let mediaInfoBox = document.getElementsByClassName("my-mediaInfoBox")[0];
+
+function openMediaInfo(mediaBox){
+    let mediaId = mediaBox.getAttribute("data-media-id");
+    console.log(mediaBox.getAttribute("data-media-id"));
+    mediaInfoBox.style.opacity = "1";
+    mediaInfoBox.style.pointerEvents = "all";
+
+    let topBox = mediaInfoBox.getElementsByClassName("my-topBox")[0];
+    let botBox = mediaInfoBox.getElementsByClassName("my-botBox")[0];
+
+    getMediaDataById(mediaId, "movie")
+                .then(mediaData => {
+                    console.log(mediaData);
+                    document.getElementById("my-mediaTrama").innerHTML = mediaData.overview;
+                    topBox.style.backgroundImage = `
+                        url("https://image.tmdb.org/t/p/w355_and_h200_multi_faces${mediaData.backdrop_path}")
+                    `;
+                });
+}
+
+function closeMediaInfo(){
+    mediaInfoBox.style.opacity = "0";
+    mediaInfoBox.style.pointerEvents = "none";
 }
 
 function toggleFilters(filterBtn){

@@ -96,7 +96,56 @@ html {margin: 0; overflow: hidden; position: relative;}
     border-radius: 25px 25px 0 0;
     background-size: cover;
     background-position: center;
+
+    max-height: auto;
+    transition: max-height .2s ease-out;
 }
+
+.my-mediaInfoBox{
+    background-color: black;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+
+.my-mediaInfoBox .my-topBox{
+    height: calc(30vh - var(--titleMovieHeight));
+    width: calc(100% - var(--generalMargin));
+    background-color: #1a1a1a;
+
+    margin: 1rem auto;
+
+    border-radius: 25px;
+    background-size: cover;
+    background-position: center;
+}
+
+.my-mediaInfoBox .my-botBox{
+    height: 70vh;
+    width: calc(100% - var(--generalMargin));
+    background-color: #1a1a1a;
+
+    margin: 1rem auto;
+
+    border-radius: 25px;
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+}
+
+.my-mediaInfoBox .my-botBox > .my-btn{
+    z-index: 9999;
+    margin-top: -.5rem;
+}
+
+/* .my-mediaBoxOpened{
+    max-height: calc(30vh - var(--titleMovieHeight));
+    transition: max-height .2s ease-out;
+} */
 
 .fa-spinner{
     animation: spin 1s linear infinite;
