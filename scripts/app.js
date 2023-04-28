@@ -400,15 +400,23 @@ function openMediaInfo(mediaBox){
                 .then(mediaData => {
                     console.log(mediaData);
                     document.getElementById("my-mediaTitle").innerHTML = mediaData.title;
-                    document.getElementById("my-mediaTrama").innerHTML = mediaData.overview;
+                    if(mediaData.overview){
+                        document.getElementById("my-mediaTrama").innerHTML = mediaData.overview;
+                    }
                     topBox.style.backgroundImage = `
                         url("https://image.tmdb.org/t/p/w780${mediaData.backdrop_path}")
                     `;
 
-                    document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>${mediaData.vote_average.toFixed(1)}/10`;
-                    document.getElementById("my-mediaDate").innerHTML = `<strong>Data d'uscita: </strong>${mediaData.release_date.split("-").reverse().join("-")}`;
-                    document.getElementById("my-mediaRuntime").innerHTML = `<strong>Durata: </strong>${mediaData.runtime} minuti`;
-                    if(mediaData.genres){
+                    if(mediaData.vote_average){
+                        document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>${mediaData.vote_average.toFixed(1)}/10`;
+                    }
+                    if(mediaData.release_date){
+                        document.getElementById("my-mediaDate").innerHTML = `<strong>Data d'uscita: </strong>${mediaData.release_date.split("-").reverse().join("-")}`;
+                    }
+                    if(mediaData.runtime){
+                        document.getElementById("my-mediaRuntime").innerHTML = `<strong>Durata: </strong>${mediaData.runtime} minuti`;
+                    }
+                    if(mediaData.genres.length > 0){
                         document.getElementById("my-mediaGenres").innerHTML = `<strong>Genere: </strong>`;
                         let nGenres = 0;
                         for(genre of mediaData.genres){
