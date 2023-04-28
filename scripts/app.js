@@ -408,6 +408,18 @@ function openMediaInfo(mediaBox){
                     document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>${mediaData.vote_average.toFixed(1)}/10`;
                     document.getElementById("my-mediaDate").innerHTML = `<strong>Data d'uscita: </strong>${mediaData.release_date.split("-").reverse().join("-")}`;
                     document.getElementById("my-mediaRuntime").innerHTML = `<strong>Durata: </strong>${mediaData.runtime} minuti`;
+                    if(mediaData.genres){
+                        document.getElementById("my-mediaGenres").innerHTML = `<strong>Genere: </strong>`;
+                        let nGenres = 0;
+                        for(genre of mediaData.genres){
+                            nGenres += 1;
+                            if(nGenres > 1){
+                                document.getElementById("my-mediaGenres").innerHTML += ", ";
+                            }
+                            document.getElementById("my-mediaGenres").innerHTML += genre.name;
+                        }
+                    }
+                    
 
                     let trailerLink = null;
                     if (mediaData.videos && mediaData.videos.results) {
