@@ -186,20 +186,17 @@ html {margin: 0; overflow: hidden; position: relative;}
 }
 
 .my-mediaInfoBox .my-botBox .my-btn{
+    min-width: 3rem;
     width: 3rem;
     height: 3rem;
-    position: sticky;
-    top: 0;
-    right: 0;
 }
 
 .my-mediaInfoBox .my-botBox .my-title{
-    background-color: crimson;
     border-radius: 15px;
 }
 
 .my-mediaInfoBox .my-botBox .my-infoBox{
-    height: calc(100vh - 200px - (var(--generalMargin) * 4.5));
+    height: calc(100vh - 200px - (var(--generalMargin) * 5.2));
     overflow-y: auto;
     overflow-x: hidden;
 }
