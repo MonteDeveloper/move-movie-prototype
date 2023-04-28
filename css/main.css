@@ -113,7 +113,7 @@ html {margin: 0; overflow: hidden; position: relative;}
 }
 
 .my-mediaInfoBox .my-topBox{
-    height: calc(30vh - var(--titleMovieHeight));
+    height: 200px;
     width: calc(100% - var(--generalMargin));
     background-color: #1a1a1a;
 
@@ -122,10 +122,28 @@ html {margin: 0; overflow: hidden; position: relative;}
     border-radius: 25px;
     background-size: cover;
     background-position: center;
+    overflow: hidden;
+}
+
+.my-mediaInfoBox .my-topBox iframe{
+    width: 100%;
+    height: 100%;
+}
+
+#my-trailerErrorBox{
+    width: 100%;
+    height: 100%;
+    background-color: #000000d5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    color: white;
+    font-weight: bold;
 }
 
 .my-mediaInfoBox .my-botBox{
-    height: 70vh;
+    height: calc(100vh - 200px - (var(--generalMargin) * 1.5));
     width: calc(100% - var(--generalMargin));
     background-color: #1a1a1a;
 
@@ -134,12 +152,35 @@ html {margin: 0; overflow: hidden; position: relative;}
     border-radius: 25px;
     background-size: cover;
     background-position: center;
-    text-align: center;
+    position: relative;
 }
 
-.my-mediaInfoBox .my-botBox > .my-btn{
-    z-index: 9999;
-    margin-top: -.5rem;
+.my-mediaInfoBox .my-botBox .my-btn{
+    width: 3rem;
+    height: 3rem;
+    position: sticky;
+    top: 0;
+    right: 0;
+}
+
+.my-mediaInfoBox .my-botBox .my-title{
+    background-color: crimson;
+    border-radius: 15px;
+}
+
+.my-mediaInfoBox .my-botBox .my-infoBox{
+    height: calc(100vh - 200px - (var(--generalMargin) * 4.5));
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.my-mediaInfoBox .my-botBox .my-title h2{
+    margin-bottom: 0 !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* number of lines to show */
+            line-clamp: 2; 
+    -webkit-box-orient: vertical;
 }
 
 /* .my-mediaBoxOpened{

@@ -105,18 +105,55 @@
         </footer>
 
 
-        <div class="my-mediaInfoBox w-100 h-100">
+        <div class="my-mediaInfoBox w-100 h-100" data-media-id="">
             <div class="my-topBox"></div>
             <div class="my-botBox">
-                <button class="btn my-btn" onclick="closeMediaInfo()">
-                    CHIUDI
-                </button>
                 <div class="m-3 text-white text-start">
-                    <div>
-                        <h3>TRAMA</h3>
-                        <p id="my-mediaTrama">
-                            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusamus nesciunt, esse iure quos error sit sequi animi natus, voluptatem laudantium exercitationem nam? Minus cumque rerum ratione ipsam facere at quos?
-                        </p>
+                    <div class="d-flex gap-2">
+                        <div class="flex-grow-1 my-title d-flex align-items-center mt-3">
+                            <h2 class="px-3 fs-6" id="my-mediaTitle">Spider-Man: No Way Home</h2>
+                        </div>
+                        <button class="btn my-btn mt-3" onclick="closeMediaInfo()">
+                            X
+                        </button>
+                    </div>
+                    <div class="my-infoBox my-2 px-3">
+                        <div>
+                            <h3>DOVE GUARDARE</h3>
+                            <p id="my-mediaPlatforms" class="fs-6">
+                                -elenco piattaforme streaming
+                            </p>
+                        </div>
+                        <div>
+                            <h3>VALUTAZIONE</h3>
+                            <p id="my-mediaVote" class="fs-6">
+                                -5/10
+                            </p>
+                        </div>
+                        <div>
+                            <h3>DATA D'USCITA</h3>
+                            <p id="my-mediaDate" class="fs-6">
+                                -04/09/01
+                            </p>
+                        </div>
+                        <div>
+                            <h3>TRAMA</h3>
+                            <p id="my-mediaTrama" class="fs-6">
+                                -Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusamus nesciunt, esse iure quos error sit sequi animi natus, voluptatem laudantium exercitationem nam? Minus cumque rerum ratione ipsam facere at quos? Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem optio enim suscipit quidem ad? Distinctio animi excepturi, quo fugiat consequatur dolores aspernatur ab laborum necessitatibus, ea nam ipsum, possimus a?
+                            </p>
+                        </div>
+                        <div>
+                            <h3>LINK TRAILER</h3>
+                            <p id="my-mediaTrailer" class="fs-6">
+                                -youtube.com
+                            </p>
+                        </div>
+                        <div>
+                            <h3>CAST</h3>
+                            <p id="my-mediaCast" class="fs-6">
+                                -elenco cast
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
