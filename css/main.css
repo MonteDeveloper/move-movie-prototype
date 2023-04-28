@@ -101,6 +101,36 @@ html {margin: 0; overflow: hidden; position: relative;}
     transition: max-height .2s ease-out;
 }
 
+.my-actorProfile{
+    height: 150px;
+    min-width: 120px;
+    width: 120px;
+    border-radius: 20px;
+    line-height: .7rem;
+    font-size: .7rem;
+    background-size: cover;
+    background-position: center;
+}
+
+#my-mediaCast{
+    overflow-x: scroll;
+}
+
+#my-mediaCast::-webkit-scrollbar{
+    display: none;
+}
+
+.my-actorProfile p{
+    text-overflow: ellipsis; /* enables ellipsis */
+    white-space: nowrap; /* keeps the text in a single line */
+    overflow: hidden; /* keeps the element from overflowing its parent */
+    background-color: #1a1a1aa2;
+    border-radius: 5px 5px 20px 20px;
+    padding: .3rem .8rem;
+    width: 100%;
+    text-align: center;
+}
+
 .my-mediaInfoBox{
     background-color: black;
     position: absolute;

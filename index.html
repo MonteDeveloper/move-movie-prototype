@@ -47,7 +47,9 @@
             <!-- FILTRI -->
             <div class="my-filterContainer d-flex gap-4 my-4 mx-4 align-items-center">
                 <!-- BOTTONE TOGGLE FILTRI -->
-                <button class="btn my-btn" onclick="toggleFilters(this)">
+
+                <!-- pulsante disabilitato: onclick="toggleFilters(this)" -->
+                <button class="btn my-btn">
                     <i class="fa-solid fa-arrow-up-wide-short"></i>
                     FILTRI
                 </button>
@@ -119,40 +121,32 @@
                     </div>
                     <div class="my-infoBox my-2 px-3">
                         <div>
-                            <h3>DOVE GUARDARE</h3>
-                            <p id="my-mediaPlatforms" class="fs-6">
-                                -elenco piattaforme streaming
-                            </p>
+                            <h3>INFORMAZIONI</h3>
+                            <div>
+                                <p id="my-mediaVote" class="fs-6 m-0">
+                                    <strong>Valutazione: </strong>nessuna valutazione disponibile
+                                </p>
+                                <p id="my-mediaDate" class="fs-6 m-0">
+                                    <strong>Data d'uscita: </strong>nessuna data disponibile
+                                </p>
+                                <p id="my-mediaRuntime" class="fs-6">
+                                    <strong>Durata: </strong>nessuna durata disponibile
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3>VALUTAZIONE</h3>
-                            <p id="my-mediaVote" class="fs-6">
-                                -5/10
-                            </p>
-                        </div>
-                        <div>
-                            <h3>DATA D'USCITA</h3>
-                            <p id="my-mediaDate" class="fs-6">
-                                -04/09/01
-                            </p>
-                        </div>
+                        <hr>
                         <div>
                             <h3>TRAMA</h3>
                             <p id="my-mediaTrama" class="fs-6">
                                 -Lorem ipsum, dolor sit amet consectetur adipisicing elit. Accusamus nesciunt, esse iure quos error sit sequi animi natus, voluptatem laudantium exercitationem nam? Minus cumque rerum ratione ipsam facere at quos? Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem optio enim suscipit quidem ad? Distinctio animi excepturi, quo fugiat consequatur dolores aspernatur ab laborum necessitatibus, ea nam ipsum, possimus a?
                             </p>
                         </div>
-                        <div>
-                            <h3>LINK TRAILER</h3>
-                            <p id="my-mediaTrailer" class="fs-6">
-                                -youtube.com
-                            </p>
-                        </div>
+                        <hr>
                         <div>
                             <h3>CAST</h3>
-                            <p id="my-mediaCast" class="fs-6">
-                                -elenco cast
-                            </p>
+                            <div class="d-flex mb-2 gap-2" id="my-mediaCast">
+                                Nessun cast disponibile
+                            </div>
                         </div>
                     </div>
                 </div>

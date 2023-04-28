@@ -405,11 +405,9 @@ function openMediaInfo(mediaBox){
                         url("https://image.tmdb.org/t/p/w780${mediaData.backdrop_path}")
                     `;
 
-                    document.getElementById("my-mediaVote").innerHTML = mediaData.vote_average;
-
-                    
-                    document.getElementById("my-mediaDate").innerHTML = mediaData.release_date;
-                                
+                    document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>${mediaData.vote_average.toFixed(1)}/10`;
+                    document.getElementById("my-mediaDate").innerHTML = `<strong>Data d'uscita: </strong>${mediaData.release_date.split("-").reverse().join("-")}`;
+                    document.getElementById("my-mediaRuntime").innerHTML = `<strong>Durata: </strong>${mediaData.runtime} minuti`;
 
                     let trailerLink = null;
                     if (mediaData.videos && mediaData.videos.results) {
@@ -448,21 +446,30 @@ function openMediaInfo(mediaBox){
                             })
                     }     
 
-                    document.getElementById("my-mediaTrailer").innerHTML = trailerLink;
-
-                    document.getElementById("my-mediaCast").innerHTML = "";
                     let cast = [];
                     if (mediaData.credits && mediaData.credits.cast) {
+                        document.getElementById("my-mediaCast").innerHTML = "";
                         for (let member of mediaData.credits.cast) {
                             cast.push({
                                 name: member.name,
                                 character: member.character,
                                 profilePath: `https://www.themoviedb.org/t/p/w138_and_h175_face${member.profile_path}`
                             });
+                            let pathImg;
+                            if(member.profile_path){
+                                pathImg = `https://www.themoviedb.org/t/p/w138_and_h175_face${member.profile_path}`;
+                            }else{
+                                pathImg = "https://www.civictheatre.ie/wp-content/uploads/2016/05/blank-profile-picture-973460_960_720.png";
+                            }
                             document.getElementById("my-mediaCast").innerHTML += 
-                                `${member.name},
-                                ${member.character},
-                                https://www.themoviedb.org/t/p/w138_and_h175_face${member.profile_path} <br>`;
+                                `
+                                <div class="my-actorProfile px-1 py-1 d-flex align-items-end bg-danger" style="background-image: url('${pathImg}');">
+                                    <p class="m-0">
+                                        ${member.name}<br>
+                                        <small>${member.character}</small>
+                                    </p>
+                                </div>
+                                `;
                         }
                     }
                 });
