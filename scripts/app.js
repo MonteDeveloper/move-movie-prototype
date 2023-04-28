@@ -460,6 +460,7 @@ function openMediaInfo(mediaBox){
                                     topBox.innerHTML = `
                                     <iframe src="${trailer}"></iframe>
                                     `;
+                                    topBox.style.backgroundImage = "none";
                                 }else{
                                     topBox.innerHTML = '<div id="my-trailerErrorBox">Trailer non disponibile</div>';
                                 }
