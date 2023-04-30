@@ -380,6 +380,12 @@ function setMediaInfoToMediaBox(media, mediaType, mediaBoxPosition){
 
 let mediaInfoBox = document.getElementsByClassName("my-mediaInfoBox")[0];
 
+async function getMediaProvidersByMediaId(mediaId, mediaType) {
+    const response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/watch/providers?api_key=${API_KEY}`);
+    const data = await response.json();
+    return data;
+}
+
 function openMediaInfo(mediaBox){
     let mediaId = mediaBox.getAttribute("data-media-id");
     console.log(mediaBox.getAttribute("data-media-id"));
@@ -396,6 +402,8 @@ function openMediaInfo(mediaBox){
     let topBox = mediaInfoBox.getElementsByClassName("my-topBox")[0];
     let botBox = mediaInfoBox.getElementsByClassName("my-botBox")[0];
 
+    let elMediaStream = document.getElementById("my-mediaStream");
+
     getMediaDataById(mediaId, "movie")
                 .then(mediaData => {
                     console.log(mediaData);
@@ -406,6 +414,51 @@ function openMediaInfo(mediaBox){
                     topBox.style.backgroundImage = `
                         url("https://image.tmdb.org/t/p/w780${mediaData.backdrop_path}")
                     `;
+
+                    elMediaStream.innerHTML = "";
+                    getMediaProvidersByMediaId(mediaId, "movie")
+                        .then(mediaProviders => {
+                            console.log(mediaProviders);
+                            if(mediaProviders.results.IT && mediaProviders.results.IT.flatrate){
+                                for(provider of mediaProviders.results.IT.flatrate){
+                                    if(
+                                        provider.provider_name.toLowerCase() == "netflix" ||
+                                        provider.provider_name.toLowerCase() == "amazon prime video" ||
+                                        provider.provider_name.toLowerCase() == "disney plus" ||
+                                        provider.provider_name.toLowerCase() == "amazon video"
+                                    ){
+                                        elMediaStream.innerHTML += `
+                                        <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                            <i class="fa-solid fa-circle-play"></i>
+                                            ${provider.provider_name}
+                                        </button>
+                                    `;
+                                    } 
+                                }
+                            }
+                            if(mediaProviders.results.IT && mediaProviders.results.IT.buy){
+                                for(provider of mediaProviders.results.IT.buy){
+                                    if(
+                                        provider.provider_name.toLowerCase() == "netflix" ||
+                                        provider.provider_name.toLowerCase() == "amazon prime video" ||
+                                        provider.provider_name.toLowerCase() == "disney plus" ||
+                                        provider.provider_name.toLowerCase() == "amazon video"
+                                    ){
+                                        elMediaStream.innerHTML += `
+                                        <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                            <i class="fa-solid fa-circle-play"></i>
+                                            ${provider.provider_name}
+                                        </button>
+                                    `;
+                                    } 
+                                }
+                            }
+
+                            
+                            if(elMediaStream.innerHTML == ""){
+                                elMediaStream.innerHTML = "Nessuna piattaforma streaming disponibile per questo contenuto";
+                            }
+                        });
 
                     if(mediaData.vote_average){
                         document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>${mediaData.vote_average.toFixed(1)}/10`;
@@ -504,6 +557,20 @@ let stopAllYouTubeVideos = () => {
             func: 'pauseVideo'
         }), '*');
     });
+}
+
+function openPlatStreaming(platName, mediaTitle){
+    console.log(platName);
+    if(platName.toLowerCase() == "netflix"){
+        window.open(`https://www.netflix.com/search?q=${encodeURIComponent(mediaTitle)}`);
+    }else if(platName.toLowerCase() == "amazon prime video" || platName.toLowerCase() == "amazon video"){
+        window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodeURIComponent(mediaTitle)}&ie=UTF8`);
+    }else if(platName.toLowerCase() == "disney plus"){
+        window.open(`https://www.disneyplus.com/search?q=${encodeURIComponent(mediaTitle)}`);
+    }else if(platName.toLowerCase() == "now tv"){
+        window.open(`https://www.nowtv.com/it/search?q=${encodeURIComponent(mediaTitle)}`);
+    }
+ 
 }
 
 function closeMediaInfo(){
