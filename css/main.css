@@ -112,11 +112,11 @@ html {margin: 0; overflow: hidden; position: relative;}
     background-position: center;
 }
 
-#my-mediaCast{
+#my-mediaCast, #my-mediaStream{
     overflow-x: scroll;
 }
 
-#my-mediaCast::-webkit-scrollbar{
+#my-mediaCast::-webkit-scrollbar, #my-mediaStream::-webkit-scrollbar{
     display: none;
 }
 

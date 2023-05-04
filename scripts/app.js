@@ -397,6 +397,9 @@ async function getMediaProvidersByMediaId(mediaId, mediaType) {
 
 function openMediaInfo(mediaBox){
     document.getElementsByClassName("my-infoBox")[0].scrollTo(0,0); 
+    document.getElementById("my-mediaCast").scrollTo(0,0); 
+    document.getElementById("my-mediaStream").scrollTo(0,0); 
+
     let mediaId = mediaBox.getAttribute("data-media-id");
     console.log(mediaBox.getAttribute("data-media-id"));
 
