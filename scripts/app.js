@@ -13,6 +13,8 @@ let eventCounter = 0;
 let isAddingElements = false;
 let scrollTimer = null;
 
+let lastFetchTime = 0;
+
 const appContainer = document.getElementsByClassName('my-appContainer')[0];
 
 //! EVENTS LISTENER--------------------------
@@ -42,7 +44,7 @@ let nMediaToAdd = 3;
 let listMediaIdVisualized = [];
 
 let step = nMediaToAdd / 10000;
-let nowStep = step;
+let nowStep = step / 2 + step / 6;
 
 scrollDiv.addEventListener('scroll', function () {
     // Calcola la posizione corrente dello scroll
@@ -114,19 +116,22 @@ async function checkApi() {
 }
 
 async function getMediaDataById(mediaId, mediaType) {
-    const response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}?append_to_response=videos,images,credits&language=it-IT&api_key=${API_KEY}`);
+    const url = `https://api.themoviedb.org/3/${mediaType}/${mediaId}?append_to_response=videos,images,credits&language=it-IT&api_key=${API_KEY}`;
+    const response = await fetchEsecutionAfterTimeout(url, 1);
     const data = await response.json();
     return data;
 }
 
 async function getMediaIdByTitle(title, mediaType, resultNumber) {
-    const response = await fetch(`https://api.themoviedb.org/3/search/${mediaType}?api_key=${API_KEY}&query=${title}&language=it-IT-IT`);
+    const url = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${API_KEY}&query=${title}&language=it-IT-IT`;
+    const response = await fetchEsecutionAfterTimeout(url, 1);
     const data = await response.json();
     return data.results[resultNumber].id;
 }
 
 async function getHigherResImageOfMediaId(mediaId, mediaType) {
-    let response = await fetch(`https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${API_KEY}&include_image_language=it`);
+    const url = `https://api.themoviedb.org/3/${mediaType}/${mediaId}/images?api_key=${API_KEY}&include_image_language=it`;
+    const response = await fetchEsecutionAfterTimeout(url, 1);
     let data = await response.json();
     
     let posters = data.posters;
@@ -164,7 +169,7 @@ async function getHigherResImageOfMediaId(mediaId, mediaType) {
 
 async function getGenresListOfMediaType(mediaType) {
     const url = `https://api.themoviedb.org/3/genre/${mediaType}/list?api_key=${API_KEY}`;
-    const response = await fetch(url);
+    const response = await fetchEsecutionAfterTimeout(url, 1);
     const data = await response.json();
     return data.genres;
 }
@@ -183,7 +188,7 @@ function processQueue() {
         if(queueOfMediaTypeToLoad.length > 0){
             scrollDiv.style.overflowY = "hidden";
         }
-        setTimeout(processQueue, 1500);
+        setTimeout(processQueue, 0);
     }
 }
 
@@ -192,7 +197,7 @@ function addMediaToScroll(){
 
     if (queueOfMediaTypeToLoad.length === 1) {
         scrollDiv.style.overflowY = "hidden";
-        setTimeout(processQueue, 1500);
+        setTimeout(processQueue, 0);
     }
 }
 
@@ -221,10 +226,10 @@ function addMediaBoxToScroll(){
     mediasCounter += 1;
     rows.push(`
         <div id="media-${mediasCounter}" class="my-movieBox d-flex flex-wrap justify-content-center align-content-start w-100">
-            <div class="my-moviePoster"></div>
-            <h2 class="my-movieTitle m-0 px-3">
+            <div class="my-moviePoster position-relative">
                 <i class="fa-solid fa-spinner"></i>
-            </h2>
+            </div>
+            <h2 class="my-movieTitle m-0 px-3"></h2>
             <div class="my-movieBgImage"></div>
         </div>
     `);
@@ -234,7 +239,7 @@ async function getRndMediaOfMediaType(mediaType) {
     const totalPages = await getTotalPages(mediaType);
     const randomPage = Math.floor(Math.random() * totalPages) + 1;
     const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&watch_region=IT&with_video=true&page=${randomPage}`;
-    const response = await fetch(url);
+    const response = await fetchEsecutionAfterTimeout(url, 1);
     const data = await response.json();
 
     const results = data.results;
@@ -278,7 +283,7 @@ async function getListRndMediasOfMediaType(mediaType, nMedia) {
         if (!pagesSearched.includes(randomPage)) {
             pagesSearched.push(randomPage);
             const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&watch_region=IT&with_video=true&page=${randomPage}`;
-            const response = await fetch(url);
+            const response = await fetchEsecutionAfterTimeout(url, 1);
             const data = await response.json();
             const results = data.results;
             let uniqueMovies = results.filter(movie => !listMediaIdVisualized.includes(movie.id));
@@ -297,7 +302,7 @@ async function getListRndMediasOfMediaType(mediaType, nMedia) {
 
 async function getTrailerByMediaId(mediaId, mediaType) {
     const url = `https://api.themoviedb.org/3/${mediaType}/${mediaId}/videos?api_key=${API_KEY}`;
-    const response = await fetch(url);
+    const response = await fetchEsecutionAfterTimeout(url, 0);
     const data = await response.json();
     const videos = data.results;
 
@@ -366,16 +371,20 @@ function setMediaInfoToMediaBox(media, mediaType, mediaBoxPosition){
 
     console.log("checkImage", mediaBoxPosition, media);
 
-    rows[mediaBoxPosition - 1] = `
-                    <div id="media-${mediaBoxPosition}" class="my-movieBox d-flex flex-wrap justify-content-center align-content-start w-100">
-                        <div data-media-id="${media.id}" class="my-moviePoster" style="background-image: url('https://image.tmdb.org/t/p/w1280${media.poster_path}')" onclick="openMediaInfo(this)"></div>
-                        <h2 class="my-movieTitle m-0 px-3">
-                            ${title}
-                        </h2>
-                        <div class="my-movieBgImage"></div>
-                    </div>
-                `;
+    let image = new Image();
+    image.src = `https://image.tmdb.org/t/p/w1280${media.poster_path}`;
+    image.onload = function () {
+        rows[mediaBoxPosition - 1] = `
+        <div id="media-${mediaBoxPosition}" class="my-movieBox d-flex flex-wrap justify-content-center align-content-start w-100">
+            <div data-media-id="${media.id}" class="my-moviePoster" style="background-image: url('${image.src}')" onclick="openMediaInfo(this)"></div>
+            <h2 class="my-movieTitle m-0 px-3">
+                ${title}
+            </h2>
+            <div class="my-movieBgImage"></div>
+        </div>
+    `;
     clusterize.update(rows);
+    }
 }
 
 let mediaInfoBox = document.getElementsByClassName("my-mediaInfoBox")[0];
@@ -387,6 +396,7 @@ async function getMediaProvidersByMediaId(mediaId, mediaType) {
 }
 
 function openMediaInfo(mediaBox){
+    document.getElementsByClassName("my-infoBox")[0].scrollTo(0,0); 
     let mediaId = mediaBox.getAttribute("data-media-id");
     console.log(mediaBox.getAttribute("data-media-id"));
 
@@ -402,14 +412,33 @@ function openMediaInfo(mediaBox){
     let topBox = mediaInfoBox.getElementsByClassName("my-topBox")[0];
     let botBox = mediaInfoBox.getElementsByClassName("my-botBox")[0];
 
+    topBox.innerHTML = `
+        <div class="postion-relative h-100 w-100 my-hidden">
+            <i class="fa-solid fa-spinner"></i>
+        </div>
+        `;
+    topBox.style.backgroundImage = "none";
+    topBox.innerHTML = `
+        <div id="my-trailerErrorBox position-relative">
+        </div>
+        <i class="fa-solid fa-spinner"></i>
+    `;
+    botBox.getElementsByTagName("div")[0].classList.toggle("my-hidden");
+    document.getElementsByClassName("my-infoBox")[0].classList.toggle("my-hidden");
+
     let elMediaStream = document.getElementById("my-mediaStream");
 
     getMediaDataById(mediaId, "movie")
                 .then(mediaData => {
+                    botBox.getElementsByTagName("div")[0].classList.toggle("my-hidden");
+                    document.getElementsByClassName("my-infoBox")[0].classList.toggle("my-hidden");
+
                     console.log(mediaData);
                     document.getElementById("my-mediaTitle").innerHTML = mediaData.title;
                     if(mediaData.overview){
                         document.getElementById("my-mediaTrama").innerHTML = mediaData.overview;
+                    }else{
+                        document.getElementById("my-mediaTrama").innerHTML = "Trama non disponibile";
                     }
                     topBox.style.backgroundImage = `
                         url("https://image.tmdb.org/t/p/w780${mediaData.backdrop_path}")
@@ -462,12 +491,18 @@ function openMediaInfo(mediaBox){
 
                     if(mediaData.vote_average){
                         document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>${mediaData.vote_average.toFixed(1)}/10`;
+                    }else{
+                        document.getElementById("my-mediaVote").innerHTML = `<strong>Valutazione: </strong>Non disponibile`;
                     }
                     if(mediaData.release_date){
                         document.getElementById("my-mediaDate").innerHTML = `<strong>Data d'uscita: </strong>${mediaData.release_date.split("-").reverse().join("-")}`;
+                    }else{
+                        document.getElementById("my-mediaDate").innerHTML = `<strong>Data d'uscita: </strong>Non disponibile`;
                     }
                     if(mediaData.runtime){
                         document.getElementById("my-mediaRuntime").innerHTML = `<strong>Durata: </strong>${mediaData.runtime} minuti`;
+                    }else{
+                        document.getElementById("my-mediaRuntime").innerHTML = `<strong>Durata: </strong>Non disponibile`;
                     }
                     if(mediaData.genres.length > 0){
                         document.getElementById("my-mediaGenres").innerHTML = `<strong>Genere: </strong>`;
@@ -479,6 +514,8 @@ function openMediaInfo(mediaBox){
                             }
                             document.getElementById("my-mediaGenres").innerHTML += genre.name;
                         }
+                    }else{
+                        document.getElementById("my-mediaGenres").innerHTML = `<strong>Genere: </strong>Non disponibile`;
                     }
                     
 
@@ -502,18 +539,31 @@ function openMediaInfo(mediaBox){
                     }
 
                     if(trailerLink){
-                        topBox.innerHTML = `
-                        <iframe src="${trailerLink}"></iframe>
-                        `;
+                        topBox.innerHTML += `
+                                    <iframe src="${trailerLink}" class="my-hidden" id="my-iframe"></iframe>
+                                    `;
+                        let iframe = document.getElementById('my-iframe');
+                        iframe.onload = function() {
+                            iframe.classList.toggle("my-hidden");
+                            topBox.style.backgroundImage = "none";
+
+                            topBox.getElementsByClassName("fa-spinner")[0].classList.toggle("my-hidden");
+                        }
                     }else{
                         getTrailerByMediaId(mediaId, "movie")
                             .then(trailer => {
                                 if(trailer){
                                     console.log("TRAILER NEW METHOD!");
-                                    topBox.innerHTML = `
-                                    <iframe src="${trailer}"></iframe>
+                                    topBox.innerHTML += `
+                                    <iframe src="${trailer}" class="my-hidden" id="my-iframe"></iframe>
                                     `;
-                                    topBox.style.backgroundImage = "none";
+                                    let iframe = document.getElementById('my-iframe');
+                                    iframe.onload = function() {
+                                        iframe.classList.toggle("my-hidden");
+                                        topBox.style.backgroundImage = "none";
+
+                                        topBox.getElementsByClassName("fa-spinner")[0].classList.toggle("my-hidden");
+                                    }                    
                                 }else{
                                     topBox.innerHTML = '<div id="my-trailerErrorBox">Trailer non disponibile</div>';
                                 }
@@ -521,7 +571,7 @@ function openMediaInfo(mediaBox){
                     }     
 
                     let cast = [];
-                    if (mediaData.credits && mediaData.credits.cast) {
+                    if (mediaData.credits && mediaData.credits.cast && mediaData.credits.cast.length > 0) {
                         document.getElementById("my-mediaCast").innerHTML = "";
                         for (let member of mediaData.credits.cast) {
                             cast.push({
@@ -535,16 +585,48 @@ function openMediaInfo(mediaBox){
                             }else{
                                 pathImg = "https://www.civictheatre.ie/wp-content/uploads/2016/05/blank-profile-picture-973460_960_720.png";
                             }
-                            document.getElementById("my-mediaCast").innerHTML += 
+
+                            // let image = new Image();
+                            // image.src = pathImg;
+                            // document.getElementById("my-mediaCast").innerHTML += 
+                            //     `
+                            //     <div class="my-actorProfile px-1 py-1 d-flex align-items-end bg-danger" style="background-image: url('${image.onload(image.src)}');">
+                            //         <p class="m-0">
+                            //             ${member.name}<br>
+                            //             <small>${member.character}</small>
+                            //         </p>
+                            //     </div>
+                            //     `;
+
+
+                            let image = new Image();
+                            image.src = pathImg;
+                            let mediaCast = document.getElementById("my-mediaCast");
+                            mediaCast.innerHTML +=
                                 `
-                                <div class="my-actorProfile px-1 py-1 d-flex align-items-end bg-danger" style="background-image: url('${pathImg}');">
+                                <div class="my-actorProfile px-1 py-1 d-flex align-items-end bg-danger" style="background-image: url('https://cdn.dribbble.com/users/100843/screenshots/1248152/loading-ring-400x300.gif');" data-src="${pathImg}">
                                     <p class="m-0">
                                         ${member.name}<br>
                                         <small>${member.character}</small>
                                     </p>
                                 </div>
                                 `;
+                            let updateBackgroundImage = function () {
+                                let actorProfiles = mediaCast.querySelectorAll('.my-actorProfile');
+                                for (let i = 0; i < actorProfiles.length; i++) {
+                                    if (actorProfiles[i].getAttribute('data-src') === pathImg) {
+                                        actorProfiles[i].style.backgroundImage = `url('${pathImg}')`;
+                                    }
+                                }
+                            }
+                            if (image.complete) {
+                                updateBackgroundImage();
+                            } else {
+                                image.onload = updateBackgroundImage;
+                            }
                         }
+                    }else{
+                        document.getElementById("my-mediaCast").innerHTML = "Cast non disponibile";
                     }
                 });
 }
@@ -611,4 +693,16 @@ function writeGenreSection(){
 
         genreSection.style.width = `${Math.ceil(genres.length / 2) * (150 + 8)}px`;
     });
+}
+
+async function fetchEsecutionAfterTimeout(link, secondsStepFetch){
+    const currentTime = Date.now();
+    const timeSinceLastFetch = currentTime - lastFetchTime;
+    if (timeSinceLastFetch < secondsStepFetch * 1000) {
+        await new Promise(resolve => setTimeout(resolve, secondsStepFetch * 1000 - timeSinceLastFetch));
+    }
+    let response = await fetch(link);
+    console.log(response);
+    lastFetchTime = Date.now();
+    return response;
 }

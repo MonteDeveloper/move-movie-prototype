@@ -222,16 +222,25 @@ html {margin: 0; overflow: hidden; position: relative;}
     position: absolute;
     margin-left: auto;
     margin-right: auto;
-    top: calc(50% - 6rem);
+    top: calc(50% - 1rem);
     left: 0;
     right: 0;
     text-align: center;
+    color: white;
+}
+
+.my-moviePoster .fa-spinner{
+    top: calc(50% + 1rem);
 }
 
 @keyframes spin {
     100%{
         rotate: 360deg;
     }
+}
+
+.my-hidden{
+    display: none !important;
 }
 
 /* ? FOOTER NAV-------------------------------------- */
