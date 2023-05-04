@@ -450,6 +450,7 @@ function openMediaInfo(mediaBox){
                     elMediaStream.innerHTML = "";
                     getMediaProvidersByMediaId(mediaId, "movie")
                         .then(mediaProviders => {
+                            let amazon = false;
                             console.log(mediaProviders);
                             if(mediaProviders.results.IT && mediaProviders.results.IT.flatrate){
                                 for(provider of mediaProviders.results.IT.flatrate){
@@ -459,12 +460,25 @@ function openMediaInfo(mediaBox){
                                         provider.provider_name.toLowerCase() == "disney plus" ||
                                         provider.provider_name.toLowerCase() == "amazon video"
                                     ){
-                                        elMediaStream.innerHTML += `
-                                        <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
-                                            <i class="fa-solid fa-circle-play"></i>
-                                            ${provider.provider_name}
-                                        </button>
-                                    `;
+                                        if(!amazon && (provider.provider_name.toLowerCase() == "amazon video" ||
+                                        provider.provider_name.toLowerCase() == "amazon prime video")){
+                                            amazon = true;
+                                            elMediaStream.innerHTML += `
+                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                                <i class="fa-solid fa-circle-play"></i>
+                                                Prime Video
+                                            </button>
+                                            `;
+                                        }else if(provider.provider_name.toLowerCase() == "netflix" ||
+                                        provider.provider_name.toLowerCase() == "disney plus"){
+                                            elMediaStream.innerHTML += `
+                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                                <i class="fa-solid fa-circle-play"></i>
+                                                ${provider.provider_name}
+                                            </button>
+                                            `;
+                                        }
+                                        console.log("Provider: ", provider.provider_name);
                                     } 
                                 }
                             }
@@ -476,12 +490,25 @@ function openMediaInfo(mediaBox){
                                         provider.provider_name.toLowerCase() == "disney plus" ||
                                         provider.provider_name.toLowerCase() == "amazon video"
                                     ){
-                                        elMediaStream.innerHTML += `
-                                        <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
-                                            <i class="fa-solid fa-circle-play"></i>
-                                            ${provider.provider_name}
-                                        </button>
-                                    `;
+                                        if(!amazon && (provider.provider_name.toLowerCase() == "amazon video" ||
+                                        provider.provider_name.toLowerCase() == "amazon prime video")){
+                                            amazon = true;
+                                            elMediaStream.innerHTML += `
+                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                                <i class="fa-solid fa-circle-play"></i>
+                                                Prime Video
+                                            </button>
+                                            `;
+                                        }else if(provider.provider_name.toLowerCase() == "netflix" ||
+                                        provider.provider_name.toLowerCase() == "disney plus"){
+                                            elMediaStream.innerHTML += `
+                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                                <i class="fa-solid fa-circle-play"></i>
+                                                ${provider.provider_name}
+                                            </button>
+                                            `;
+                                        }
+                                        console.log("Provider: ", provider.provider_name);
                                     } 
                                 }
                             }
