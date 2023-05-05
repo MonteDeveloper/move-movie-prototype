@@ -830,6 +830,7 @@ function toggleFilters(){
     filterBox = document.getElementsByClassName("my-filterContainer")[0].querySelector('div');
     document.getElementById("my-filterBox").scrollTo(0,0);
     blackScreen = document.getElementsByClassName("my-blackScreen")[0];
+    document.getElementById("my-filterGenreSection").parentElement.scrollTo(0,0);
 
     if(filterBox.getAttribute("data-isOpened") == "false"){
         // filterBtn.style.transform = "translate(0, calc(-80vh + var(--btnFilterHeight) * 2.2))";
