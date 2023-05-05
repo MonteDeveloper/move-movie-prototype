@@ -26,7 +26,7 @@ html {margin: 0; overflow: hidden; position: relative;}
     left: 0;
     z-index: 990;
     opacity: 0;
-    transition: opacity .2s;
+    transition: opacity .5s;
     pointer-events: none;
 }
 
@@ -286,6 +286,10 @@ footer nav .fa-solid.my-active{
     transition: color .2s, background-color .2s !important;
 }
 
+hr{
+    color: white !important;
+}
+
 .my-btn:active{
     scale: .95;
 }
@@ -295,23 +299,27 @@ footer nav .fa-solid.my-active{
     height: var(--btnFilterHeight);
 }
 
-.my-filterContainer > .my-btn{
+/* .my-filterContainer > .my-btn{
     z-index: 99999;
     transition: transform .2s !important;
+} */
+
+#my-filterBox{
+    overflow-y: auto;
 }
 
 .my-filterContainer > div{
     position: absolute;
     width: calc(100% - var(--generalMargin));
     background-color: #1a1a1a;
-    height: 80vh;
+    height: 70vh;
     bottom: 0;
     left: 50%;
-    transform: translate(-50%, 0) scale(1, 0);
+    transform: translate(-50%, 200%);
     border-radius: 25px;
     z-index: 9999;
     transform-origin: bottom center;
-    transition: transform .2s ease-out;
+    transition: transform .5s ease-out;
 }
 
 .my-filterContainer > div .my-btn.my-active{

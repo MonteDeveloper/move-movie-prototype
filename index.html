@@ -49,51 +49,80 @@
                 <!-- BOTTONE TOGGLE FILTRI -->
 
                 <!-- pulsante disabilitato: onclick="toggleFilters(this)" -->
-                <button class="btn my-btn">
+                <button class="btn my-btn" onclick="toggleFilters()">
                     <i class="fa-solid fa-arrow-up-wide-short"></i>
                     FILTRI
                 </button>
 
                 <!-- FILTERBOX -->
-                <div class="py-5 px-3">
-                    <!-- FILTRO GENERI -->
-                    <section>
-                        <h4 class="m-1 text-uppercase text-white">genere</h4>
-                        <div>
-                            <div id="my-filterGenreSection" class="d-flex flex-wrap"></div>
-                        </div>
-                    </section>
+                <div class="p-3 text-center d-flex flex-column justify-content-between" data-isOpened="false">
+                    <div id="my-filterBox">
+                        <!-- FILTRO GENERI -->
+                        <section>
+                            <h4 class="m-1 text-uppercase text-white">genere</h4>
+                            <div>
+                                <div id="my-filterGenreSection" class="d-flex flex-wrap"></div>
+                            </div>
+                        </section>
 
-                    <!-- FILTRO ANNO -->
-                    <section>
-                        <h4 class="m-1 text-uppercase text-white">ANNO d'USCITA</h4>
-                        <div>
-                            <div class="input-group">
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" id="firstName" placeholder="Dal">
-                                    <label for="firstName">DALL'ANNO...</label>
-                                </div>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="lastName" placeholder="Al">
-                                    <label for="lastName">FINO ALL'ANNO...</label>
+                        <i class="fa-solid fa-angles-down text-white my-2"></i>
+    
+                        <!-- FILTRO ANNO -->
+                        <section>
+                            <h4 class="m-1 text-uppercase text-white">ANNO d'USCITA</h4>
+                            <div>
+                                <div class="input-group">
+                                    <div class="form-floating mb-1">
+                                        <input type="number" class="form-control" id="my-filterYear1" placeholder="Dal">
+                                        <label for="my-filterYear1">DALL'ANNO...</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="my-filterYear2" placeholder="Al">
+                                        <label for="my-filterYear2">FINO ALL'ANNO...</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <!-- FILTRO VALUTAZIONE -->
-                    <section>
-                        <h4 class="m-1 text-uppercase text-white">VALUTAZIONE</h4>
-                        <div>
-                            <div class="d-flex">
-                                <button class="btn my-btn text-uppercase text-center m-1 text-nowrap">1 <i class="fa-solid fa-star pe-none"></i></button>
-                                <button class="btn my-btn text-uppercase text-center m-1 text-nowrap">2 <i class="fa-solid fa-star pe-none"></i></button>
-                                <button class="btn my-btn text-uppercase text-center m-1 text-nowrap">3 <i class="fa-solid fa-star pe-none"></i></button>
-                                <button class="btn my-btn text-uppercase text-center m-1 text-nowrap">4 <i class="fa-solid fa-star pe-none"></i></button>
-                                <button class="btn my-btn text-uppercase text-center m-1 text-nowrap">5 <i class="fa-solid fa-star pe-none"></i></button>
+                        <i class="fa-solid fa-angles-down text-white my-2"></i>
+    
+                        <!-- FILTRO VALUTAZIONE -->
+                        <section>
+                            <h4 class="m-1 text-uppercase text-white">LINGUA ORIGINALE</h4>
+                            <div>
+                                <div class="d-flex flex-wrap justify-content-center" id="my-filterLanguageSection">
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-lang="it">ITALIANO</i></button>
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-lang="en">INGLESE</i></button>
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-lang="fr">FRANCESE</i></button>
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-lang="es">SPAGNOLO</i></button>
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap"
+                                    data-lang="jp">GIAPPONESE</i></button>
+                                </div>
                             </div>
+                        </section>
+
+                        <i class="fa-solid fa-angles-down text-white my-2"></i>
+    
+                        <!-- FILTRO PROVIDER -->
+                        <section">
+                            <h4 class="m-1 text-uppercase text-white">DISPONIBILE SU</h4>
+                            <div>
+                                <div class="d-flex flex-wrap justify-content-center" id="my-filterProviderSection">
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-providerId="8">Netflix</i></button>
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-providerId="9|10">Prime Video</i></button>
+                                    <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-providerId="337">Disney+</i></button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div>
+                        <hr class="mt-0">
+                        <div class="d-flex gap-2 justify-content-center align-items-end">
+                            <button class="btn my-btn bg-transparent border-white text-white" onclick="toggleFilters()">ANNULLA</button>
+                            <button class="btn my-btn" onclick="toggleFilters()">APPLICA</button>
                         </div>
-                    </section>
+                    </div>
                 </div>
             </div>
 

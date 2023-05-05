@@ -46,21 +46,6 @@ let listMediaIdVisualized = [];
 let step = nMediaToAdd / 10000;
 let nowStep = step / 2 + step / 6;
 
-scrollDiv.addEventListener('scroll', function () {
-    // Calcola la posizione corrente dello scroll
-    let scrollTop = scrollDiv.scrollTop;
-    // Calcola l'altezza totale della pagina
-    let scrollHeight = scrollDiv.scrollHeight - scrollDiv.clientHeight;
-    // Calcola la percentuale di scroll
-    let scrollPercent = scrollTop / scrollHeight;
-    // Se la percentuale di scroll è maggiore o uguale al 50%
-    if (scrollPercent >= nowStep) {
-        // Richiama la funzione desiderata
-        addMediaToScroll();
-        nowStep += step;
-    }
-});
-
 appContainer.addEventListener('click', (event) => {
     const isToggleButton = event.target.classList.contains("my-btn");
     if (!isToggleButton) {
@@ -79,8 +64,25 @@ async function main() {
 
     writeGenreSection();
 
-    // Genera 10000 righe con un'immagine per riga
-    for (let i = 0; i < 10000; i++) {
+    // Genera tot righe con un'immagine per riga
+    let nMedias = await getTotalPages("movie");
+    step = nMediaToAdd / parseInt(nMedias[1]);
+    nowStep = step / 2 + step / 6;
+    scrollDiv.addEventListener('scroll', function () {
+        // Calcola la posizione corrente dello scroll
+        let scrollTop = scrollDiv.scrollTop;
+        // Calcola l'altezza totale della pagina
+        let scrollHeight = scrollDiv.scrollHeight - scrollDiv.clientHeight;
+        // Calcola la percentuale di scroll
+        let scrollPercent = scrollTop / scrollHeight;
+        // Se la percentuale di scroll è maggiore o uguale al 50%
+        if (scrollPercent >= nowStep) {
+            // Richiama la funzione desiderata
+            addMediaToScroll();
+            nowStep += step;
+        }
+    });
+    for (let i = 0; i < nMedias[1]; i++) {
         addMediaBoxToScroll();
     }
 
@@ -273,18 +275,69 @@ async function getRndMediaOfMediaType(mediaType) {
 //     return randomMovies;
 // }
 
+const filters = {
+    genres: [], // Action
+    year: [2020, 2020], // Between 2010 and 2020
+    withOriginalLanguage: 'it',
+    withWatchProviders: [8, 9, 10] // Netflix
+};
+
+// 2 Apple TV
+// 8 Netflix
+// 9 Amazon Prime Video
+// 10 Amazon Video
+// 29 Sky Go
+// 39 Now TV
+// 192 YouTube
+// 210 Sky
+// 337 Disney Plus
+
+// en: Inglese
+// it: Italiano
+// fr: Francese
+// es: Spagnolo
+// de: Tedesco
+// zh: Cinese
+// ja: Giapponese
+// ko: Coreano
+// hi: Hindi
+// ru: Russo
+
+const language = 'it-IT';
+const sortBy = 'popularity.desc';
+const watchRegion = 'IT';
+const withVideo = true;
+
 async function getListRndMediasOfMediaType(mediaType, nMedia) {
 
     const totalPages = await getTotalPages(mediaType);
     let randomMovies = [];
     let pagesSearched = [];
-    while (randomMovies.length < nMedia && pagesSearched.length < totalPages) {
-        const randomPage = Math.floor(Math.random() * totalPages) + 1;
+
+    const baseUrl = `https://api.themoviedb.org/3/discover/${mediaType}`;
+
+    while (randomMovies.length < nMedia && pagesSearched.length < totalPages[0]) {
+        const randomPage = Math.floor(Math.random() * totalPages[0]) + 1;
         if (!pagesSearched.includes(randomPage)) {
             pagesSearched.push(randomPage);
-            const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&watch_region=IT&with_video=true&page=${randomPage}`;
+
+            let url = `
+                    ${baseUrl}?api_key=${API_KEY}
+                    &language=${language}
+                    &sort_by=${sortBy}
+                    &watch_region=${watchRegion}
+                    &with_video=${withVideo}
+                    &page=${randomPage}
+                    &with_genres=${filters.genres.join(',')}
+                    &primary_release_date.gte=${filters.year[0]}-01-01
+                    &primary_release_date.lte=${filters.year[1]}-12-31
+                    &with_original_language=${filters.withOriginalLanguage}
+                    &with_watch_providers=${filters.withWatchProviders.join('|')}`;
+
+            url = url.replace(/\s+/g, ''); //rimuovo indentazione della stringa
             const response = await fetchEsecutionAfterTimeout(url, 1);
             const data = await response.json();
+            console.log(response, data);
             const results = data.results;
             let uniqueMovies = results.filter(movie => !listMediaIdVisualized.includes(movie.id));
             while (randomMovies.length < nMedia && uniqueMovies.length > 0) {
@@ -327,8 +380,22 @@ async function getTrailerByMediaId(mediaId, mediaType) {
 }
 
 async function getTotalPages(mediaType) {
-    return 500;
-    const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&page=1`;
+    const baseUrl = `https://api.themoviedb.org/3/discover/${mediaType}`;
+    let url = `
+            ${baseUrl}?api_key=${API_KEY}
+            &language=${language}
+            &sort_by=${sortBy}
+            &watch_region=${watchRegion}
+            &with_video=${withVideo}
+            &page=${1}
+            &with_genres=${filters.genres.join(',')}
+            &primary_release_date.gte=${filters.year[0]}-01-01
+            &primary_release_date.lte=${filters.year[1]}-12-31
+            &with_original_language=${filters.withOriginalLanguage}
+            &with_watch_providers=${filters.withWatchProviders.join('|')}`;
+
+    url = url.replace(/\s+/g, ''); //rimuovo indentazione della stringa
+    
     const response = await fetch(url);
     const data = await response.json();
     
@@ -336,7 +403,9 @@ async function getTotalPages(mediaType) {
         return 500;
     }
 
-    return data.total_pages;
+    console.log("PAGINE/RISULTATI: ", data.total_pages, data.total_results);
+
+    return [data.total_pages, data.total_results];
 }
 
 function setMediaInfoToMediaBox(media, mediaType, mediaBoxPosition){
@@ -464,7 +533,7 @@ function openMediaInfo(mediaBox){
                                         provider.provider_name.toLowerCase() == "amazon prime video")){
                                             amazon = true;
                                             elMediaStream.innerHTML += `
-                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.title.replace("'", " ")}')">
                                                 <i class="fa-solid fa-circle-play"></i>
                                                 Prime Video
                                             </button>
@@ -472,7 +541,7 @@ function openMediaInfo(mediaBox){
                                         }else if(provider.provider_name.toLowerCase() == "netflix" ||
                                         provider.provider_name.toLowerCase() == "disney plus"){
                                             elMediaStream.innerHTML += `
-                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.original_title.replace("'", " ")}')">
+                                            <button class="btn my-btn text-nowrap" onclick="openPlatStreaming('${provider.provider_name}', '${mediaData.title.replace("'", " ")}')">
                                                 <i class="fa-solid fa-circle-play"></i>
                                                 ${provider.provider_name}
                                             </button>
@@ -691,24 +760,91 @@ function closeMediaInfo(){
     stopAllYouTubeVideos();
 }
 
-function toggleFilters(filterBtn){
+function toggleFilters(){
     filterBox = document.getElementsByClassName("my-filterContainer")[0].querySelector('div');
 
     blackScreen = document.getElementsByClassName("my-blackScreen")[0];
 
-    if(!filterBtn.classList.contains('my-active')){
-        filterBtn.style.transform = "translate(0, calc(-80vh + var(--btnFilterHeight) * 2.2))";
-        filterBox.style.transform = "translate(-50%, 0) scale(1, 1)";
+    if(filterBox.getAttribute("data-isOpened") == "false"){
+        // filterBtn.style.transform = "translate(0, calc(-80vh + var(--btnFilterHeight) * 2.2))";
+        filterBox.style.transform = "translate(-50%, 0)";
         blackScreen.style.opacity = ".8";
         blackScreen.style.pointerEvents = "all";
-        filterBtn.innerHTML = '<i class="fa-solid fa-arrow-down-wide-short"></i> FILTRI';
+        filterBox.setAttribute("data-isOpened", "true");
+        // filterBtn.innerHTML = '<i class="fa-solid fa-arrow-down-wide-short"></i> FILTRI';
     }else{
-        filterBtn.style.transform = "translate(0, 0)";
-        filterBox.style.transform = "translate(-50%, 0) scale(1, 0)";
+        // filterBtn.style.transform = "translate(0, 0)";
+        filterBox.style.transform = "translate(-50%, 200%)";
         blackScreen.style.opacity = "0";
         blackScreen.style.pointerEvents = "none";
-        filterBtn.innerHTML = '<i class="fa-solid fa-arrow-up-wide-short"></i> FILTRI';
+        filterBox.setAttribute("data-isOpened", "false");
+        // filterBtn.innerHTML = '<i class="fa-solid fa-arrow-up-wide-short"></i> FILTRI';
     }
+}
+
+function updateScrollWithFilters(){
+    const elGenreSection = document.getElementById("my-filterGenreSection");
+    const elfilterLanguageSection = document.getElementById("my-filterLanguageSection");
+    const elProviderSection = document.getElementById("my-filterProviderSection");
+
+    filters.genres = [];
+    for(btn of elGenreSection.children){
+        if(btn.classList.contains("my-active")){
+            filters.genres.push(btn.getAttribute("data-genreId"));
+        }
+    }
+
+    filters.withOriginalLanguage = "";
+    for(btn of elfilterLanguageSection.children){
+        if(btn.classList.contains("my-active")){
+            filters.withOriginalLanguage = btn.getAttribute("data-lang");
+            break;
+        }
+    }
+
+    filters.year = [
+        document.getElementById("my-filterYear1").value,
+        document.getElementById("my-filterYear2").value
+    ];
+
+    filters.withWatchProviders = [];
+    for(btn of elProviderSection.children){
+        if(btn.classList.contains("my-active")){
+            filters.withWatchProviders.push(btn.getAttribute("data-providerId"));
+        }
+    }
+
+    console.log(filters);
+}
+
+function resetFilters(){
+    const elGenreSection = document.getElementById("my-filterGenreSection");
+    const elfilterLanguageSection = document.getElementById("my-filterLanguageSection");
+    const elProviderSection = document.getElementById("my-filterProviderSection");
+
+    for(btn of elGenreSection.children){
+        btn.classList.remove("my-active");
+        if(filters.genres.includes(btn.getAttribute("data-genreId"))){
+            btn.classList.add("my-active");
+        }
+    }
+
+    for(btn of elfilterLanguageSection.children){
+        btn.classList.remove("my-active");
+        if(filters.withOriginalLanguage == btn.getAttribute("data-lang")){
+            btn.classList.add("my-active");
+        }
+    }
+
+    for(btn of elProviderSection.children){
+        btn.classList.remove("my-active");
+        if(filters.withWatchProviders.includes(btn.getAttribute("data-providerId"))){
+            btn.classList.add("my-active");
+        }
+    }
+
+    document.getElementById("my-filterYear1").value = filters.year[0];
+    document.getElementById("my-filterYear2").value = filters.year[1];
 }
 
 function writeGenreSection(){
@@ -717,7 +853,7 @@ function writeGenreSection(){
     getGenresListOfMediaType("movie").then(genres => {
         for(genre of genres){
             genreSection.innerHTML += `
-                <button class="btn my-btn text-uppercase text-center m-1" data-id="${genre.id}">${genre.name}</button>
+                <button class="btn my-btn text-uppercase text-center m-1" data-genreId="${genre.id}">${genre.name}</button>
             `;
         }
 
