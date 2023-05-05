@@ -308,6 +308,10 @@ hr{
     overflow-y: auto;
 }
 
+#my-filterBox::-webkit-scrollbar{
+    display: none;
+}
+
 .my-filterContainer > div{
     position: absolute;
     width: calc(100% - var(--generalMargin));
@@ -322,7 +326,7 @@ hr{
     transition: transform .5s ease-out;
 }
 
-.my-filterContainer > div .my-btn.my-active{
+.my-filterContainer div:first-child .my-btn.my-active{
     color: white !important;
     background-color: crimson !important;
 }
@@ -331,9 +335,10 @@ hr{
     overflow-x: scroll;
 }
 
-.my-filterGenreSection .my-btn{
+#my-filterGenreSection .my-btn{
     width: 150px;
-    height: 62px;
+    min-height: 50px;
+    padding: 0 1rem 0 1rem !important;
 }
 
 .my-filterContainer > div section > div::-webkit-scrollbar{

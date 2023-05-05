@@ -67,8 +67,14 @@ async function main() {
     writeGenreSection();
 
     // Genera tot righe con un'immagine per riga
+    // Genera tot righe con un'immagine per riga
     let nMedias = await getTotalPages("movie");
-    step = nMediaToAdd / parseInt(nMedias[1]);
+    if(nMedias[1] > 500){
+        nMedias = 500;
+    }else{
+        nMedias = nmedias[1];
+    }
+    step = nMediaToAdd / parseInt(nMedias);
     nowStep = step / 2 + step / 6;
     scrollDiv.addEventListener('scroll', function () {
         // Calcola la posizione corrente dello scroll
@@ -84,7 +90,7 @@ async function main() {
             nowStep += step;
         }
     });
-    for (let i = 0; i < nMedias[1]; i++) {
+    for (let i = 0; i < nMedias; i++) {
         addMediaBoxToScroll();
     }
 
@@ -108,10 +114,15 @@ async function resetScroll(){
     
     // Genera tot righe con un'immagine per riga
     let nMedias = await getTotalPages("movie");
-    step = nMediaToAdd / parseInt(nMedias[1]);
+    if(nMedias[1] > 500){
+        nMedias = 500;
+    }else{
+        nMedias = nmedias[1];
+    }
+    step = nMediaToAdd / parseInt(nMedias);
     nowStep = step / 2 + step / 6;
 
-    for (let i = 0; i < nMedias[1]; i++) {
+    for (let i = 0; i < nMedias; i++) {
         addMediaBoxToScroll();
     }
 
@@ -259,6 +270,7 @@ function addMediaBoxToScroll(){
 
 async function getRndMediaOfMediaType(mediaType) {
     const totalPages = await getTotalPages(mediaType);
+    totalPages = totalPages[0];
     const randomPage = Math.floor(Math.random() * totalPages) + 1;
     const url = `https://api.themoviedb.org/3/discover/${mediaType}?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc&watch_region=IT&with_video=true&page=${randomPage}`;
     const response = await fetchEsecutionAfterTimeout(url, 1);
@@ -297,9 +309,9 @@ async function getRndMediaOfMediaType(mediaType) {
 
 const filters = {
     genres: [], // Action
-    year: [2020, 2020], // Between 2010 and 2020
-    withOriginalLanguage: 'it',
-    withWatchProviders: [8, 9, 10] // Netflix
+    year: ["", ""], // Between 2010 and 2020
+    withOriginalLanguage: '',
+    withWatchProviders: [] // Netflix
 };
 
 // 2 Apple TV
@@ -341,6 +353,15 @@ async function getListRndMediasOfMediaType(mediaType, nMedia) {
         if (!pagesSearched.includes(randomPage)) {
             pagesSearched.push(randomPage);
 
+            let firstYear = "";
+            let lastYear = "";
+            if(filters.year[0]){
+                firstYear = `${filters.year[0]}-01-01`;
+            }
+            if(filters.year[1]){
+                lastYear = `${filters.year[1]}-12-31`;
+            }
+
             let url = `
                     ${baseUrl}?api_key=${API_KEY}
                     &language=${language}
@@ -349,8 +370,8 @@ async function getListRndMediasOfMediaType(mediaType, nMedia) {
                     &with_video=${withVideo}
                     &page=${randomPage}
                     &with_genres=${filters.genres.join(',')}
-                    &primary_release_date.gte=${filters.year[0]}-01-01
-                    &primary_release_date.lte=${filters.year[1]}-12-31
+                    &primary_release_date.gte=${firstYear}
+                    &primary_release_date.lte=${lastYear}
                     &with_original_language=${filters.withOriginalLanguage}
                     &with_watch_providers=${filters.withWatchProviders.join('|')}`;
 
@@ -402,32 +423,51 @@ async function getTrailerByMediaId(mediaId, mediaType) {
 }
 
 async function getTotalPages(mediaType) {
-    const baseUrl = `https://api.themoviedb.org/3/discover/${mediaType}`;
+    let baseUrl
+    if(mediaType){
+        baseUrl = `https://api.themoviedb.org/3/discover/${mediaType}`;
+    }else{
+        baseUrl = `https://api.themoviedb.org/3/discover/movie`;
+    }
+
+    let firstYear = "";
+    let lastYear = "";
+    if(filters.year[0]){
+        firstYear = `${filters.year[0]}-01-01`;
+    }
+    if(filters.year[1]){
+        lastYear = `${filters.year[1]}-12-31`;
+    }
+    
     let url = `
-            ${baseUrl}?api_key=${API_KEY}
-            &language=${language}
-            &sort_by=${sortBy}
-            &watch_region=${watchRegion}
-            &with_video=${withVideo}
-            &page=${1}
-            &with_genres=${filters.genres.join(',')}
-            &primary_release_date.gte=${filters.year[0]}-01-01
-            &primary_release_date.lte=${filters.year[1]}-12-31
-            &with_original_language=${filters.withOriginalLanguage}
-            &with_watch_providers=${filters.withWatchProviders.join('|')}`;
+        ${baseUrl}?api_key=${API_KEY}
+        &language=${language}
+        &sort_by=${sortBy}
+        &watch_region=${watchRegion}
+        &with_video=${withVideo}
+        &page=${1}
+        &with_genres=${filters.genres.join(',')}
+        &primary_release_date.gte=${firstYear}
+        &primary_release_date.lte=${lastYear}
+        &with_original_language=${filters.withOriginalLanguage}
+        &with_watch_providers=${filters.withWatchProviders.join('|')}`;
 
     url = url.replace(/\s+/g, ''); //rimuovo indentazione della stringa
     
+    console.log("pgaeUrl: ", url);
     const response = await fetch(url);
     const data = await response.json();
     
-    if(data.totalPages > 500){
-        return 500;
+    let result;
+    if(data.total_pages > 500){
+        result = [500, data.total_results];
+    }else{
+        result = [data.total_pages, data.total_results];
     }
 
-    console.log("PAGINE/RISULTATI: ", data.total_pages, data.total_results);
+    console.log("PAGINE/RISULTATI: ", result[0], result[1]);
 
-    return [data.total_pages, data.total_results];
+    return result;
 }
 
 function setMediaInfoToMediaBox(media, mediaType, mediaBoxPosition){
@@ -788,7 +828,7 @@ function closeMediaInfo(){
 
 function toggleFilters(){
     filterBox = document.getElementsByClassName("my-filterContainer")[0].querySelector('div');
-
+    document.getElementById("my-filterBox").scrollTo(0,0);
     blackScreen = document.getElementsByClassName("my-blackScreen")[0];
 
     if(filterBox.getAttribute("data-isOpened") == "false"){
@@ -841,6 +881,14 @@ function updateScrollWithFilters(){
     }
 
     console.log(filters);
+}
+
+function resetOthersButtonsInGroup(btn){
+    for(otherBtn of btn.parentElement.children){
+        if(otherBtn != btn){
+            otherBtn.classList.remove("my-active");
+        }
+    }
 }
 
 function resetFilters(){
