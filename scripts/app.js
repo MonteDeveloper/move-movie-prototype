@@ -117,7 +117,7 @@ async function resetScroll(){
     if(nMedias[1] > 500){
         nMedias = 500;
     }else{
-        nMedias = nmedias[1];
+        nMedias = nMedias[1];
     }
     step = nMediaToAdd / parseInt(nMedias);
     nowStep = step / 2 + step / 6;
