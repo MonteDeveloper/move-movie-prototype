@@ -3,15 +3,17 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 let API_KEY;
 let msg = 'Inserisci la password per accedere al servizio:';
 
-let mediasCounter = 0;
+
 let currentMediaLoading = false;
 
 let scrollDiv = document.getElementsByClassName("my-moviesContainer")[0];
+let mediasCounter = 0;
 let queueOfMediaTypeToLoad = [];
 let nMaxMediaScroll = 10;
 let eventCounter = 0;
 let isAddingElements = false;
 let scrollTimer = null;
+let mediaLoaded = 0;
 
 let lastFetchTime = 0;
 
@@ -96,6 +98,26 @@ async function main() {
     });
 }
 
+async function resetScroll(){
+    mediasCounter = 0;
+    mediaLoaded = 0;
+    queueOfMediaTypeToLoad = [];
+    
+    rows.length = 0;
+    clusterize.update(rows);
+    
+    // Genera tot righe con un'immagine per riga
+    let nMedias = await getTotalPages("movie");
+    step = nMediaToAdd / parseInt(nMedias[1]);
+    nowStep = step / 2 + step / 6;
+
+    for (let i = 0; i < nMedias[1]; i++) {
+        addMediaBoxToScroll();
+    }
+
+    addMediaToScroll();
+}
+
 main();
 
 //! FUNCTIONS--------------------------------
@@ -175,8 +197,6 @@ async function getGenresListOfMediaType(mediaType) {
     const data = await response.json();
     return data.genres;
 }
-
-let mediaLoaded = 0;
 
 
 function processQueue() {
@@ -335,6 +355,8 @@ async function getListRndMediasOfMediaType(mediaType, nMedia) {
                     &with_watch_providers=${filters.withWatchProviders.join('|')}`;
 
             url = url.replace(/\s+/g, ''); //rimuovo indentazione della stringa
+            console.log(url);
+
             const response = await fetchEsecutionAfterTimeout(url, 1);
             const data = await response.json();
             console.log(response, data);
@@ -441,7 +463,11 @@ function setMediaInfoToMediaBox(media, mediaType, mediaBoxPosition){
     console.log("checkImage", mediaBoxPosition, media);
 
     let image = new Image();
-    image.src = `https://image.tmdb.org/t/p/w1280${media.poster_path}`;
+    if(media.poster_path){
+        image.src = `https://image.tmdb.org/t/p/w1280${media.poster_path}`;
+    }else{
+        image.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png";
+    }
     image.onload = function () {
         rows[mediaBoxPosition - 1] = `
         <div id="media-${mediaBoxPosition}" class="my-movieBox d-flex flex-wrap justify-content-center align-content-start w-100">

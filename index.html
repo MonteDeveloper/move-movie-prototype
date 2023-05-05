@@ -96,7 +96,7 @@
                                     <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-lang="fr">FRANCESE</i></button>
                                     <button class="btn my-btn text-uppercase text-center m-1 text-nowrap" data-lang="es">SPAGNOLO</i></button>
                                     <button class="btn my-btn text-uppercase text-center m-1 text-nowrap"
-                                    data-lang="jp">GIAPPONESE</i></button>
+                                    data-lang="ja">GIAPPONESE</i></button>
                                 </div>
                             </div>
                         </section>
@@ -119,8 +119,8 @@
                     <div>
                         <hr class="mt-0">
                         <div class="d-flex gap-2 justify-content-center align-items-end">
-                            <button class="btn my-btn bg-transparent border-white text-white" onclick="toggleFilters()">ANNULLA</button>
-                            <button class="btn my-btn" onclick="toggleFilters()">APPLICA</button>
+                            <button class="btn my-btn bg-transparent border-white text-white" onclick="toggleFilters(); resetFilters()">ANNULLA</button>
+                            <button class="btn my-btn" onclick="toggleFilters(); updateScrollWithFilters(); resetScroll()">APPLICA</button>
                         </div>
                     </div>
                 </div>

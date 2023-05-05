@@ -339,3 +339,10 @@ hr{
 .my-filterContainer > div section > div::-webkit-scrollbar{
     display: none;
 }
+
+.clusterize-no-data{
+    line-height: calc(100vh - 1rem  - var(--footHeight) - (var(--generalMargin) * 2) - var(--btnFilterHeight) - var(--titleMovieHeight));
+    background-color: #1a1a1a;
+    margin: var(--generalMargin);
+    border-radius: 25px;
+}
