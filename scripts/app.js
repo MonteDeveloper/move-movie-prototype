@@ -134,7 +134,7 @@ main();
 //! FUNCTIONS--------------------------------
 async function checkApi() {
     let data;
-    while (!data) {
+    while (!data && localStorage.getItem('API_KEY') == null) {
         API_KEY = prompt(msg);
         try {
             const response = await fetch(`https://api.themoviedb.org/3/movie/550?api_key=${API_KEY}`);
@@ -142,6 +142,9 @@ async function checkApi() {
                 throw new Error('Chiave API non valida');
             }
             data = await response.json();
+            if(data){
+                localStorage.setItem('API_KEY', JSON.stringify(API_KEY));
+            }
         } catch (error) {
             console.error(error);
         }
