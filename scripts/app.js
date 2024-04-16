@@ -150,7 +150,7 @@ async function checkApi() {
         }
         msg = "Password errata, riprova:";
     }
-    // La chiave API è valida, gestisci i dati qui
+    API_KEY = localStorage.getItem('API_KEY');
 }
 
 async function getMediaDataById(mediaId, mediaType) {
